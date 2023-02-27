@@ -44,10 +44,11 @@ class CNNFlattener(nn.Module):
 
         # Channel attention module to help focus on important channels
         self.ca = ChannelAttention(in_channels * 8, ratio=8)
-
+        
+        in_channels = in_channels * 8 # set the input channels for the first CNN block
+        
         # Construct the CNN using CNNBlock modules
         layers = []
-        in_channels = in_channels  # input channels for the first CNN block
         for feature in features:
             layers.append(CNNBlock(in_channels,
                                    feature,
@@ -81,3 +82,10 @@ class CNNFlattener(nn.Module):
         x = self.model(x)
         x = self.last_conv(x).squeeze(-1).squeeze(-1)
         return x
+    
+    
+if __name__ == "__main__": # testing the model
+  x = torch.randn((16,12,128,128))
+  model = CNNFlattener()
+  preds = model(x)
+  print(preds.shape)
