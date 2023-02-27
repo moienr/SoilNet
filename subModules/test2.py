@@ -1,0 +1,1 @@
+some_list = ['moien', 'negin']
