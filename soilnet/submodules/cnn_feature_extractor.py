@@ -80,7 +80,7 @@ class CNNFlattener(nn.Module):
         x = self.conv_sep(x)
         x = self.ca(x)
         x = self.model(x)
-        x = self.last_conv(x).squeeze(-1).squeeze(-1)
+        x = self.last_conv(x).squeeze(-1).squeeze(-1) # flatten the output, don't just use squeeze() because it will remove the batch dimension if it is 1
         return x
     
     
