@@ -1,7 +1,70 @@
 import torch
 import torch.nn as nn
 from channel_attention import ChannelAttention
-from cnn_block import CNNBlock
+
+class CNNBlock(nn.Module):
+    """
+    A building block for a Convolutional Neural Network (CNN) that consists of a convolutional layer followed
+    by an optional instance normalization layer and a leaky ReLU activation function.
+
+    Args:
+        in_channels (int): Number of input channels.
+        out_channels (int): Number of output channels.
+        kernel_size (int): Size of the convolutional kernel (default: 4).
+        stride (int): Stride of the convolution (default: 2).
+        padding (int): Padding of the convolution (default: 0).
+        norm (bool): Whether to apply instance normalization (default: True).
+
+    Input:
+        x (tensor): Input tensor of shape (batch_size, in_channels, height, width).
+
+    Output:
+        output (tensor): Output tensor of shape (batch_size, out_channels, height', width').
+    """
+    def __init__(self, in_channels, out_channels, kernel_size=4, stride=2, padding=0, norm=True):
+        super().__init__()
+
+        layers = []
+        layers.append(nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, padding_mode='reflect'))
+        if norm:
+            layers.append(nn.InstanceNorm2d(out_channels))
+        layers.append(nn.LeakyReLU(0.2))
+
+        self.conv = nn.Sequential(*layers)
+
+    def forward(self, x):
+        """
+        Applies the CNN block to the input tensor.
+
+        Args:
+            x (tensor): Input tensor of shape (batch_size, in_channels, height, width).
+
+        Returns:
+            output (tensor): Output tensor of shape (batch_size, out_channels, height', width').
+        """
+        output = self.conv(x)
+        return output
+    
+def test_cnn_block():
+    """
+    Tests the CNNBlock class.
+    """
+    x = torch.randn((32, 12, 128, 128))
+    cnn_block = CNNBlock(
+      in_channels = 12,
+      out_channels = 64,
+      kernel_size = 4,
+      padding= 0,
+      stride = 2,
+      norm = True)
+    
+    output = cnn_block(x)
+    print(output.shape)   
+    
+    
+    
+    
+    
 
 class CNNFlattener(nn.Module):
     """
@@ -84,8 +147,20 @@ class CNNFlattener(nn.Module):
         return x
     
     
+def test_cnn_flattener():
+    """
+    Tests the CNNFlattener class.
+    """
+    x = torch.randn((16, 12, 128, 128))
+    cnn_flattener = CNNFlattener()
+    output = cnn_flattener(x)
+    print(output.shape)
+
+
+
+   
 if __name__ == "__main__": # testing the model
-  x = torch.randn((16,12,128,128))
-  model = CNNFlattener()
-  preds = model(x)
-  print(preds.shape)
+    print("Testing CNNBlock...")
+    test_cnn_block()
+    print("Testing CNNFlattener...")
+    test_cnn_flattener()
