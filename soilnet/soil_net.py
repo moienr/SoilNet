@@ -1,11 +1,10 @@
 import torch
 import torch.nn as nn
-import os
-import sys
-
-script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
-script_dir = os.path.dirname(script_path) #i.e. /path/to/dir/
-sys.path.append(script_dir + '\submodules') # add submodules to path so that CNNFlattener can import ChannelAttention from within CNNFlattener
+# import os
+# import sys
+# script_path = os.path.abspath(__file__) # i.e. /path/to/dir/foobar.py
+# script_dir = os.path.dirname(script_path) #i.e. /path/to/dir/
+# sys.path.append(script_dir + '\submodules') # add submodules to path so that CNNFlattener can import ChannelAttention from within CNNFlattener
 
 from submodules.cnn_feature_extractor import CNNFlattener
 from submodules.regressor import Regressor
