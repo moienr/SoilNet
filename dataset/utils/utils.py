@@ -1,11 +1,11 @@
 import ee
 import geemap
-if __name__ != '__main__':
-    try:
-        ee.Initialize()
-    except Exception as e:
-        print("Failed to initialize Earth Engine: ", e)
-        print("Maybe try ee.Authenticate() and ee.Initialize() again?")
+# if __name__ != '__main__':
+#     try:
+#         ee.Initialize()
+#     except Exception as e:
+#         print("Failed to initialize Earth Engine: ", e)
+#         print("Maybe try ee.Authenticate() and ee.Initialize() again?")
 
 
 def get_square_roi(lat, lon, roi_size = 1920, return_gee_object = False):
@@ -75,6 +75,7 @@ def read_csv(csv_path):
     df = pd.read_csv(csv_path)
     # first column is the index, so we drop it
     df = df.iloc[:, 1:4]
+    df.columns = ['Piont_id', 'long', 'lat']
     return df
 
 
