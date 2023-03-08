@@ -1,10 +1,12 @@
 import ee
 import geemap
-try:
-    ee.Initialize()
-except Exception as e:
-    print("Failed to initialize Earth Engine: ", e)
-    print("Maybe try ee.Authenticate() and ee.Initialize() again?")
+if __name__ != '__main__':
+    try:
+        ee.Initialize()
+    except Exception as e:
+        print("Failed to initialize Earth Engine: ", e)
+        print("Maybe try ee.Authenticate() and ee.Initialize() again?")
+
 
 def get_square_roi(lat, lon, roi_size = 1920, return_gee_object = False):
     """
@@ -46,17 +48,79 @@ def get_square_roi(lat, lon, roi_size = 1920, return_gee_object = False):
     else:
         # Return the square ROI as a list of coordinates
         return roi
+    
+    
+
+import numpy as np
+
+def correct_image_shape(image):
+    """
+    Transposes an image with size (C, H, W) to an image with size (H, W, C).
+
+    Args:
+        image (numpy array): An input image with size (C, H, W).
+
+    Returns:
+        numpy array: The transposed image with size (H, W, C).
+    """
+    # Swap the axes of the input image
+    transposed_image = np.swapaxes(image, 0, 2)
+    transposed_image = np.swapaxes(transposed_image, 0, 1)
+    
+    return transposed_image
+
+import pandas as pd
+def read_csv(csv_path):
+    # read csv file into a pandas dataframe
+    df = pd.read_csv(csv_path)
+    
+    # select columns 0, 1, and 2 and rename them
+    df = df.iloc[:, 1:4]
+    #df.columns = ['id', 'lat', 'long']
+    
+    return df
+
+from datetime import datetime
+def milsec2date(millsec_list: list, no_duplicate = False)->list:
+  '''
+  Input
+  ---
+  this function takes `imgcollection.aggregate_array('system:time_start')` which is a list of milliseconds dates as input
+
+  Reutrns
+  ---
+  * Defult: a list of dates in GEE date string format
+  * No_duplicate: returns the list of dates but removes the duplicates
+    '''
+  if no_duplicate:
+    date = [datetime.fromtimestamp(t/1000.0).strftime('%Y-%m-%d') for t in millsec_list]
+    date_no_duplicate = list(dict.fromkeys(date))
+    return  date_no_duplicate
+  else:
+    date = [datetime.fromtimestamp(t/1000.0).strftime('%Y-%m-%d') for t in millsec_list] 
+    return date
 
 
-def test_function(function, *args, **kwargs):
+
+def test_function(function,shape=False, *args, **kwargs):
     try:
         output = function(*args, **kwargs)
         print('Test passed!')
-        print(output)
+        if shape:
+            print(output.shape)
+        else:
+            print(output)
     except Exception as e:
         print('Test failed!')
         print(e)
 
 
+
+
+
 if __name__ == '__main__':
-    test_function(get_square_roi, 40.02, -105.25, roi_size=1920)
+    #test_function(get_square_roi, 40.02, -105.25, roi_size=1920)
+    #test_function(correct_image_shape,True,  np.random.rand(3, 256, 256))
+    df = read_csv('D:\\python\\SoilNet\\dataset\\utils\\test.csv')
+    print(df)
+    
