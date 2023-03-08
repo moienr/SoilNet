@@ -73,12 +73,11 @@ import pandas as pd
 def read_csv(csv_path):
     # read csv file into a pandas dataframe
     df = pd.read_csv(csv_path)
-    
-    # select columns 0, 1, and 2 and rename them
+    # first column is the index, so we drop it
     df = df.iloc[:, 1:4]
-    #df.columns = ['id', 'lat', 'long']
-    
     return df
+
+
 
 from datetime import datetime
 def milsec2date(millsec_list: list, no_duplicate = False)->list:
