@@ -53,57 +53,68 @@ def get_square_roi(lat, lon, roi_size = 1920, return_gee_object = False):
         return roi
     
     
-class CloudMask:
+
+# CloudMask but in a function form
+def get_cloud_mask(img: ee.Image, pixel_quality_band='QA_PIXEL',
+                    cloud_bit = 3,
+                    cloud_shadow_bit = 4,
+                    cloud_confidence_bit = 8,
+                    cloud_shadow_confidence_bit = 10):
+    """Takes an ee.Image and returns the cloud, cloud shadow and  cloud_or_cloudShadow mask
+
+    Args:
+        `img` (ee.Image): An ee.Image object containing a pixel quality band. (e.g. 'QA_PIXEL' of Landsat8 SR)
+        `pixel_quality_band` (str, optional): Name of the pixel quality band. Default is 'QA_PIXEL'. (e.g. 'QA_PIXEL' of Landsat8 SR)
+        `cloud_bit` (int, optional): Bit position of the cloud bit. Default is 3.
+        `cloud_shadow_bit` (int, optional): Bit position of the cloud shadow bit. Default is 4.
+        `cloud_confidence_bit` (int, optional): Bit position of the cloud confidence bit. Default is 8.
+        `cloud_shadow_confidence_bit` (int, optional): Bit position of the cloud shadow confidence bit. Default is 10.
+        
+        * Refrence for Defualt Values: https://developers.google.com/earth-engine/datasets/catalog/LANDSAT_LC08_C02_T1_L2#bands
+
+    Returns:
+        tuple: A tuple containing the cloud mask, cloud shadow mask, and the combined mask. (ee.Image, ee.Image, ee.Image)
     """
-    A class that creates a cloud mask for Earth Engine Images with bit Quality Band (e.g. Landsat, sentinel, etc.)
-    Takes in the the bit numbers of the cloud and cloud shadow bands in the Quality Band.
-    
-    Usage:
-    ------
-    ```
-    cm = CloudMask()
-    cloud_mask, cloud_shadow, cloud_or_shadow = cm(img)
- 
-    ```
+    qa = img.select(pixel_quality_band)
+    # Get the pixel values for the cloud, cloud shadow, and snow/ice bits
+    cloud = qa.bitwiseAnd(1 << cloud_bit).And(qa.bitwiseAnd(3<<cloud_confidence_bit))
+    cloud_shadow = qa.bitwiseAnd(1 << cloud_shadow_bit).And(qa.bitwiseAnd(3<<cloud_shadow_confidence_bit))
+    return cloud, cloud_shadow, cloud.Or(cloud_shadow)
+
+
+
+# Function to get the Ratio of ones to total pixels
+def get_mask_ones_ratio(mask:ee.Image, scale = 30):
     """
-    def __init__(self, pixel_quality_band='QA_PIXEL', cloud_bit = 3, cloud_shadow_bit = 4, cloud_confidence_bit = 8, cloud_shadow_confidence_bit = 10):
-        """
-        Parameters:
-        -----------
-            pixel_quality_band: str, optional (default='QA_PIXEL')
-                The name of the band in the image that contains pixel quality information.
+    Function to get the ratio of ones to total pixels in an Earth Engine image mask.
 
-            cloud_bit: int, optional (default=3)
-                The bit position for the cloud mask in the pixel quality band.
+    Args:
+    -----
+        `mask` (ee.Image): An Earth Engine image mask.
+        `scale` (int, optional): The scale to use for reducing the image. Defaults to 30.
 
-            cloud_shadow_bit: int, optional (default=4)
-                The bit position for the cloud shadow mask in the pixel quality band.
+    Returns:
+    --------
+        float: The ratio of ones to total pixels in the mask.
+    """
+    # Compute the number of ones and total number of pixels in the mask
+    band_name = mask.bandNames().getInfo()[0]
+    stats = mask.reduceRegion(
+        reducer=ee.Reducer.sum().combine(
+            reducer2=ee.Reducer.count(),
+            sharedInputs=True
+        ),
+        geometry=mask.geometry(),
+        scale=scale,
+        maxPixels=1e9
+    )
 
-            cloud_confidence_bit: int, optional (default=8)
-                The bit position for the cloud confidence mask in the pixel quality band.
+    # Extract the number of ones and total number of pixels from the result
+    ones = stats.get(band_name + '_sum')
+    total = stats.get(band_name + '_count')
 
-            cloud_shadow_confidence_bit: int, optional (default=10)
-                The bit position for the cloud shadow confidence mask in the pixel quality band.
-            
-            * defualt values are for Landsat 8 Level 2 SR
-        """
-        self.pixel_quality_band = pixel_quality_band
-        self.cloud_bit = cloud_bit
-        self.cloud_shadow_bit = cloud_shadow_bit
-        self.cloud_confidence_bit = cloud_confidence_bit
-        self.cloud_shadow_confidence_bit = cloud_shadow_confidence_bit
+    # Compute the ratio of ones to total pixels
+    ratio = ee.Number(ones).divide(total)
 
-    def __call__(self, img: ee.Image):
-        """Takes an ee.Image and returns the cloud, cloud shadow and  cloud_or_cloudShadow mask
-
-        Args:
-            img (ee.Image): An ee.Image object containing a pixel quality band. (e.g. 'QA_PIXEL' of Landsat8 SR)
-
-        Returns:
-            tuple: A tuple containing the cloud mask, cloud shadow mask, and the combined mask. (ee.Image, ee.Image, ee.Image)
-        """
-        self.qa = img.select(self.pixel_quality_band)
-        # Get the pixel values for the cloud, cloud shadow, and snow/ice bits
-        cloud = self.qa.bitwiseAnd(1 << self.cloud_bit).And(self.qa.bitwiseAnd(3<<self.cloud_confidence_bit))
-        cloud_shadow = self.qa.bitwiseAnd(1 << self.cloud_shadow_bit).And(self.qa.bitwiseAnd(3<<self.cloud_shadow_confidence_bit))
-        return cloud, cloud_shadow, cloud.Or(cloud_shadow)
+    # Return the ratio
+    return ratio.getInfo()
