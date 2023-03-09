@@ -83,8 +83,10 @@ def get_cloud_mask(img: ee.Image, pixel_quality_band='QA_PIXEL',
 
 
 
+
+
 # Function to get the Ratio of ones to total pixels
-def get_mask_ones_ratio(mask:ee.Image, scale = 30):
+def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
     """
     Function to get the ratio of ones to total pixels in an Earth Engine image mask.
 
@@ -98,7 +100,7 @@ def get_mask_ones_ratio(mask:ee.Image, scale = 30):
         float: The ratio of ones to total pixels in the mask.
     """
     # Compute the number of ones and total number of pixels in the mask
-    band_name = mask.bandNames().getInfo()[0]
+    #band_name = mask.bandNames().getInfo()[0]
     stats = mask.reduceRegion(
         reducer=ee.Reducer.sum().combine(
             reducer2=ee.Reducer.count(),
@@ -115,6 +117,7 @@ def get_mask_ones_ratio(mask:ee.Image, scale = 30):
 
     # Compute the ratio of ones to total pixels
     ratio = ee.Number(ones).divide(total)
+    
 
     # Return the ratio
-    return ratio.getInfo()
+    return ratio
