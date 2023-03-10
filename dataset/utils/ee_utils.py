@@ -82,6 +82,29 @@ def get_cloud_mask(img: ee.Image, pixel_quality_band='QA_PIXEL',
     return cloud, cloud_shadow, cloud.Or(cloud_shadow)
 
 
+# Snow/Ice mask
+def get_snow_mask(img: ee.Image, pixel_quality_band='QA_PIXEL',
+                    snow_bit = 5,
+                    snow_confidence_bit = 12):
+    """Takes an ee.Image and returns the Snow mask
+
+    Args:
+        `img` (ee.Image): An ee.Image object containing a pixel quality band. (e.g. 'QA_PIXEL' of Landsat8 SR)
+        `pixel_quality_band` (str, optional): Name of the pixel quality band. Default is 'QA_PIXEL'. (e.g. 'QA_PIXEL' of Landsat8 SR)
+        `snow_bit` (int, optional): Bit position of the snow bit. Default is 3.
+        `snow_confidence_bit` (int, optional): Bit position of the snow confidence bit. Default is 8.
+
+        
+        * Refrence for Defualt Values: https://developers.google.com/earth-engine/datasets/catalog/LANDSAT_LC08_C02_T1_L2#bands
+
+    Returns:
+        tuple: A tuple containing the snow mask, snow shadow mask, and the combined mask. (ee.Image, ee.Image, ee.Image)
+    """
+    qa = img.select(pixel_quality_band)
+    snow = qa.bitwiseAnd(1 << snow_bit).And(qa.bitwiseAnd(3<<snow_confidence_bit))
+    return snow
+
+
 
 
 
