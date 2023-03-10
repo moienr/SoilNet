@@ -172,3 +172,47 @@ def getMineralIndices(inImage):
     outStack = inImage.addBands([clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex])
 
     return outStack
+
+
+def get_closest_image(image_collection:ee.ImageCollection, date:str, clip_dates: int = None) -> ee.Image:
+    """
+    Returns the closest image in the given image collection to the given date.
+    Parameters:
+    -----------
+    `image_collection` : ee.ImageCollection
+        The image collection from which to find the closest image.
+    `date` : str or datetime
+        The target date as a string in "YYYY-MM-DD" format or a datetime object.
+    `clip_dates` : int, optional
+        The number of days to clip the image collection to. Only images within this range
+        of the target date will be considered. If not specified, all images in the collection
+        will be considered.
+
+    Returns:
+    --------
+    closest_image : ee.Image
+        The closest image in the image collection to the target date.
+
+    """
+    # Convert the date to milliseconds since the Unix epoch
+    date_millis = ee.Date(date).millis()
+    
+    if clip_dates:
+        # Filter the collection to images within 7 days of the target date
+        filtered_collection = image_collection.filterDate(
+            ee.Date(date).advance(-1*clip_dates, 'day'),
+            ee.Date(date).advance(clip_dates, 'day')
+        )
+    else:
+        filtered_collection = image_collection
+    
+    # Compute the time difference between each image and the target date
+    filtered_collection = ee.ImageCollection(
+        ee.List(filtered_collection.toList(filtered_collection.size()))
+        .map(lambda image: image.set('timeDiff', abs(ee.Number(image.date().millis()).subtract(date_millis))))
+    )
+    
+    # Get the image with the minimum time difference
+    closest_image = filtered_collection.sort('timeDiff').first()
+    
+    return closest_image
