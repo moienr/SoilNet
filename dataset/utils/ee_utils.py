@@ -1,4 +1,25 @@
 """ A collection of utility functions for working with Earth Engine (EE) in Python.
+
+    Functions
+    ---------
+    ### `get_square_roi` :
+        returns a square region of interest (ROI) centered at the given latitude and longitude coordinates with the specified size.
+    ### `get_cloud_mask` : 
+        Takes an ee.Image and returns the cloud, cloud shadow and  cloud_or_cloudShadow mask
+    ### `get_snow_mask` : 
+        Takes an ee.Image and returns the snow mask
+    ### `get_mean_ndvi` :
+        Takes an ee.Image and returns the mean NDVI value of the image
+    ### `get_mask_ones_ratio` : 
+        Takes a  01 mask as an ee.Image and returns the ratio of ones in the mask
+    ### `get_not_nulls_ratio` : 
+        Takes an ee.Image and returns the ratio of pixels that are not null in the image.
+    ### `add_mineral_indices` : 
+        Takes an ee.Image and adds the following mineral indices to it as it bands: clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex
+    ### `get_closest_image` : 
+        Takes an ee.ImageCollection and a date and returns the image in the collection that is closest to the given date.
+    ### `radiometric_correction`: 
+        Takes an ee.Image and returns the radiometrically corrected image. (only the Reflectance bands will change)
 """
 
 import ee
@@ -105,11 +126,28 @@ def get_snow_mask(img: ee.Image, pixel_quality_band='QA_PIXEL',
     return snow
 
 
+from typing import List
+def get_mean_ndvi(image, bands: List[str] = ['SR_B5', 'SR_B4']):
+    """
+    Returns the mean NDVI of the given image.
+    """
+    # Compute NDVI
+    ndvi = image.normalizedDifference(bands)
+    
+    # Compute mean of NDVI
+    mean_ndvi = ndvi.reduceRegion(
+        reducer=ee.Reducer.mean(),
+        geometry=image.geometry(),
+        scale=image.projection().nominalScale(),
+        maxPixels=1e13
+    ).get('nd')
+    
+    return mean_ndvi
 
 
 
 # Function to get the Ratio of ones to total pixels
-def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
+def get_mask_ones_ratio(mask:ee.Image, scale = 30):
     """
     Function to get the ratio of ones to total pixels in an Earth Engine image mask.
 
@@ -135,8 +173,8 @@ def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
     )
 
     # Extract the number of ones and total number of pixels from the result
-    ones = stats.get(band_name + '_sum')
-    total = stats.get(band_name + '_count')
+    ones = stats.get(stats.keys().get(1))
+    total = stats.get(stats.keys().get(0))
 
     # Compute the ratio of ones to total pixels
     ratio = ee.Number(ones).divide(total)
@@ -147,9 +185,9 @@ def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
 
 
 # Function to get the Ratio of Nulls to total pixels that an roi could have
-def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30) -> ee.Number:
+def get_not_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30) -> ee.Number:
     """
-        Calculates the ratio of null values to total pixels that an ROI (Region of Interest) could have for a given image.
+        Calculates the ratio of not null null values to total pixels that an ROI (Region of Interest) could have for a given image.
         
         Args:
         -----
@@ -159,35 +197,14 @@ def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30) -> ee.Number:
         
         Returns:
         --------
-        - ratio (ee.Number): The ratio of null values to total pixels for the given ROI and image.
+        - ratio (ee.Number): The ratio of not null null values to total pixels for the given ROI and image.
     """
 
     # Creates a 1 & 0 mask of the image, 0 on null areas, and 1 for pixels with values
     # th clip is really important since, mask() method goes over boundries.
     mask = image.mask().select(0).clip(roi)
-    
-    
-    stats = mask.reduceRegion(
-        reducer=ee.Reducer.sum().combine(
-            reducer2=ee.Reducer.count(),
-            sharedInputs=True
-        ),
-        geometry=roi,
-        scale=scale,
-        maxPixels=1e9
-    )
-
-    # Extract the number of ones and total number of pixels from the result
-    # Notice that the inside reducer (reducer2) is first initialized so it is reducer 0
-    ones = stats.get(stats.keys().get(1))
-    total = stats.get(stats.keys().get(0))
-
-    # Compute the ratio of ones to total pixels
-    ratio = ee.Number(ones).divide(total)
-    
-
     # Return the ratio
-    return ratio
+    return get_mask_ones_ratio(mask, scale = scale)
 
 
 
@@ -263,3 +280,18 @@ def get_closest_image(image_collection:ee.ImageCollection, date:str, clip_dates:
     return closest_image
 
 
+# applying the Mult and Add function to the image bands but the QABand
+def radiometric_correction(image: ee.Image , sr_bands_list = ['SR_B1','SR_B2','SR_B3','SR_B4','SR_B5','SR_B6','SR_B7']):
+    """
+    Applies radiometric correction to the surface reflectance (SR) bands of an input image, excluding the QA band.
+
+    Args:
+        image: An ee.Image object representing the input image.
+        sr_bands_list: A list of strings representing the names of the surface reflectance bands to be corrected.
+
+    Returns:
+        An ee.Image object with the radiometrically corrected SR bands added as new bands to the input image.
+    """
+    sr_bands = image.select(sr_bands_list).multiply(2.75e-05).add(-0.2)
+    image = image.addBands(sr_bands, None, True)
+    return image
