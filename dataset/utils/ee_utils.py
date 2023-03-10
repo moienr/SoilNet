@@ -146,7 +146,7 @@ def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
     return ratio
 
 
-def getMineralIndices(inImage):
+def add_mineral_indices(inImage):
     """
     Adds four new bands (clayIndex, ferrousIndex, carbonateIndex, and rockOutcropIndex) to an input image.
     
