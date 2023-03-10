@@ -146,6 +146,48 @@ def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
     return ratio
 
 
+# Function to get the Ratio of ones to total pixels
+def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30):
+    """
+    Function to get the ratio of ones to total pixels in an Earth Engine image mask.
+
+    Args:
+    -----
+        `mask` (ee.Image): An Earth Engine image mask.
+        `scale` (int, optional): The scale to use for reducing the image. Defaults to 30.
+
+    Returns:
+    --------
+        float: The ratio of ones to total pixels in the mask.
+    """
+    # Creates a 1 & 0 mask of the image, 0 on null areas, and 1 for pixels with values
+    # th clip is really important since, mask() method goes over boundries.
+    mask = image.mask().select(0).clip(roi)
+    
+    
+    stats = mask.reduceRegion(
+        reducer=ee.Reducer.sum().combine(
+            reducer2=ee.Reducer.count(),
+            sharedInputs=True
+        ),
+        geometry=mask.geometry(),
+        scale=scale,
+        maxPixels=1e9
+    )
+
+    # Extract the number of ones and total number of pixels from the result
+    # Notice that the inside reducer (reducer2) is first initialized so it is reducer 0
+    ones = stats.get(stats.keys().get(1))
+    total = stats.get(stats.keys().get(0))
+
+    # Compute the ratio of ones to total pixels
+    ratio = ee.Number(ones).divide(total)
+    
+
+    # Return the ratio
+    return ratio
+
+
 def add_mineral_indices(inImage):
     """
     Adds four new bands (clayIndex, ferrousIndex, carbonateIndex, and rockOutcropIndex) to an input image.
@@ -216,3 +258,5 @@ def get_closest_image(image_collection:ee.ImageCollection, date:str, clip_dates:
     closest_image = filtered_collection.sort('timeDiff').first()
     
     return closest_image
+
+
