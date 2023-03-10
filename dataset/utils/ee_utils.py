@@ -144,3 +144,31 @@ def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
 
     # Return the ratio
     return ratio
+
+
+def getMineralIndices(inImage):
+    """
+    Adds four new bands (clayIndex, ferrousIndex, carbonateIndex, and rockOutcropIndex) to an input image.
+    
+    Parameters:
+        inImage (ee.Image): The input image to add the new bands to.
+        
+    Returns:
+        ee.Image: The output image with the added bands.
+    """
+    # Clay Minerals = swir1 / swir2
+    clayIndex = inImage.select('SR_B6').divide(inImage.select('SR_B7')).rename('clayIndex')
+
+    # Ferrous Minerals = swir / nir
+    ferrousIndex = inImage.select('SR_B6').divide(inImage.select('SR_B5')).rename('ferrousIndex')
+
+    # Carbonate Index = (red - green) / (red + green)
+    carbonateIndex = inImage.normalizedDifference(['SR_B4','SR_B3']).rename('carbonateIndex')
+
+    # Rock Outcrop Index = (swir1 - green) / (swir1 + green)
+    rockOutcropIndex = inImage.normalizedDifference(['SR_B6','SR_B3']).rename('rockOutcropIndex')
+
+    # Add bands
+    outStack = inImage.addBands([clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex])
+
+    return outStack
