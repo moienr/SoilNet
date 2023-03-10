@@ -146,20 +146,22 @@ def get_mask_ones_ratio(mask:ee.Image, band_name="QA_PIXEL", scale = 30):
     return ratio
 
 
-# Function to get the Ratio of ones to total pixels
-def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30):
+# Function to get the Ratio of Nulls to total pixels that an roi could have
+def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30) -> ee.Number:
     """
-    Function to get the ratio of ones to total pixels in an Earth Engine image mask.
-
-    Args:
-    -----
-        `mask` (ee.Image): An Earth Engine image mask.
-        `scale` (int, optional): The scale to use for reducing the image. Defaults to 30.
-
-    Returns:
-    --------
-        float: The ratio of ones to total pixels in the mask.
+        Calculates the ratio of null values to total pixels that an ROI (Region of Interest) could have for a given image.
+        
+        Args:
+        -----
+        - image (ee.Image): The image for which the nulls ratio needs to be calculated.
+        - roi (ee.Geometry): The region of interest for which the nulls ratio needs to be calculated.
+        - scale (int, optional): The scale at which to perform the reduction. Defaults to 30.
+        
+        Returns:
+        --------
+        - ratio (ee.Number): The ratio of null values to total pixels for the given ROI and image.
     """
+
     # Creates a 1 & 0 mask of the image, 0 on null areas, and 1 for pixels with values
     # th clip is really important since, mask() method goes over boundries.
     mask = image.mask().select(0).clip(roi)
@@ -170,7 +172,7 @@ def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30):
             reducer2=ee.Reducer.count(),
             sharedInputs=True
         ),
-        geometry=mask.geometry(),
+        geometry=roi,
         scale=scale,
         maxPixels=1e9
     )
@@ -186,6 +188,7 @@ def get_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30):
 
     # Return the ratio
     return ratio
+
 
 
 def add_mineral_indices(inImage):
