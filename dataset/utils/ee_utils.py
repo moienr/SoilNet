@@ -147,14 +147,15 @@ def get_mean_ndvi(image, bands: List[str] = ['SR_B5', 'SR_B4']):
 
 
 # Function to get the Ratio of ones to total pixels
-def get_mask_ones_ratio(mask:ee.Image, scale = 30):
+def get_mask_ones_ratio(mask:ee.Image, scale = 30, in_percentage = True):
     """
-    Function to get the ratio of ones to total pixels in an Earth Engine image mask.
+    Function to get the percentage or the ratio of ones to total pixels in an Earth Engine image mask.
 
     Args:
     -----
         `mask` (ee.Image): An Earth Engine image mask.
         `scale` (int, optional): The scale to use for reducing the image. Defaults to 30.
+        `in_percentage` (bool, optional): Whether to return the ratio or the percentage. Defaults to True.
 
     Returns:
     --------
@@ -181,7 +182,7 @@ def get_mask_ones_ratio(mask:ee.Image, scale = 30):
     
 
     # Return the ratio
-    return ratio
+    return ratio.multiply(100) if in_percentage else ratio
 
 
 # Function to get the Ratio of Nulls to total pixels that an roi could have
@@ -283,7 +284,7 @@ def get_closest_image(image_collection:ee.ImageCollection, date:str, clip_dates:
 # applying the Mult and Add function to the image bands but the QABand
 def radiometric_correction(image: ee.Image , sr_bands_list = ['SR_B1','SR_B2','SR_B3','SR_B4','SR_B5','SR_B6','SR_B7']):
     """
-    Applies radiometric correction to the surface reflectance (SR) bands of an input image, excluding the QA band.
+    Applies radiometric correction to the surface reflectance (SR) bands of an input image, and leaves other bands unchanged.
 
     Args:
         image: An ee.Image object representing the input image.
