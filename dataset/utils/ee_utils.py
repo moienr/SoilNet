@@ -186,7 +186,7 @@ def get_mask_ones_ratio(mask:ee.Image, scale = 30, in_percentage = True):
 
 
 # Function to get the Ratio of Nulls to total pixels that an roi could have
-def get_not_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30) -> ee.Number:
+def get_not_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30, in_percentage = True) -> ee.Number:
     """
         Calculates the ratio of not null null values to total pixels that an ROI (Region of Interest) could have for a given image.
         
@@ -205,7 +205,7 @@ def get_not_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30) -> ee.Numbe
     # th clip is really important since, mask() method goes over boundries.
     mask = image.mask().select(0).clip(roi)
     # Return the ratio
-    return get_mask_ones_ratio(mask, scale = scale)
+    return get_mask_ones_ratio(mask, scale = scale, in_percentage = in_percentage)
 
 
 
