@@ -65,6 +65,39 @@ def test_function(function,shape=False, *args, **kwargs):
 
 
 class TextColors:
+    """
+    A class containing ANSI escape codes for printing colored text to the terminal.
+    
+    Usage:
+    ------
+    ```
+    print(TextColors.HEADER + 'This is a header' + TextColors.ENDC)
+    print(TextColors.OKBLUE + 'This is OK' + TextColors.ENDC)
+    ```
+    
+    Attributes:
+    -----------
+    `HEADER` : str
+        The ANSI escape code for a bold magenta font color.
+    `OKBLUE` : str
+        The ANSI escape code for a bold blue font color.
+    `OKCYAN` : str
+        The ANSI escape code for a bold cyan font color.
+    `OKGREEN` : str
+        The ANSI escape code for a bold green font color.
+    `WARNING` : str
+        The ANSI escape code for a bold yellow font color.
+    `FAIL` : str
+        The ANSI escape code for a bold red font color.
+    `ENDC` : str
+        The ANSI escape code for resetting the font color to the default.
+    `BOLD` : str
+        The ANSI escape code for enabling bold font style.
+    `UNDERLINE` : str
+        The ANSI escape code for enabling underlined font style.
+    
+    
+    """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
