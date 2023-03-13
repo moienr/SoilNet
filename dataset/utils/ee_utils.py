@@ -209,9 +209,9 @@ def get_not_nulls_ratio(image:ee.Image, roi:ee.Geometry ,scale = 30, in_percenta
 
 
 
-def add_mineral_indices(inImage):
+def add_mineral_indices(inImage): #Please change the name of the function if necessary.
     """
-    Adds four new bands (clayIndex, ferrousIndex, carbonateIndex, and rockOutcropIndex) to an input image.
+    Adds five new bands (clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex and ndvi) to an input image.
     
     Parameters:
         inImage (ee.Image): The input image to add the new bands to.
@@ -230,9 +230,12 @@ def add_mineral_indices(inImage):
 
     # Rock Outcrop Index = (swir1 - green) / (swir1 + green)
     rockOutcropIndex = inImage.normalizedDifference(['SR_B6','SR_B3']).rename('rockOutcropIndex')
+    
+    # NDVI Index = (Band 5 – Band 4) / (Band 5 + Band 4) 
+    ndvi = inImage.normalizedDifference(['SR_B5', 'SR_B4']).rename('NDVI');
 
     # Add bands
-    outStack = inImage.addBands([clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex])
+    outStack = inImage.addBands([clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex, ndvi])
 
     return outStack
 
