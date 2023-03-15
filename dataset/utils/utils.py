@@ -108,6 +108,18 @@ class TextColors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+import os
+def create_folder_if_not_exists(folder_name):
+    """Creates a folder in the current working directory if it doesn't exist.
+
+    Args:
+        folder_name (str): The name of the folder to be created.
+    """
+    if not os.path.exists(folder_name):
+        os.makedirs(folder_name)
+        print(f'Folder "{folder_name}" created in the current working directory.')
+    else:
+        print(f'Folder "{folder_name}" already exists in the current working directory.')
 
 if __name__ == '__main__':
     #test_function(get_square_roi, 40.02, -105.25, roi_size=1920)
