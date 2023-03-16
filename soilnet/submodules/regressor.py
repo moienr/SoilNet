@@ -98,7 +98,7 @@ class MultiHeadRegressor(nn.Module):
     def forward(self, *inputs:torch.Tensor) -> torch.Tensor:
         """ Forward pass of the MultiHeadRegressor.
         Args:
-        *inputs (torch.Tensor): The inputs to the model, should be of the same length as the number of input_sizes.
+        `*inputs` (torch.Tensor): The inputs to the model, should be of the same length as the number of input_sizes.
         Returns:
             torch.Tensor: The output of the model, which is a scalar value with shape (batch_size, 1).
         """
