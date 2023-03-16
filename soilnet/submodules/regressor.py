@@ -54,10 +54,49 @@ class Regressor(nn.Module):
         return output
 
 
+    
+    
+    
+class MultiHeadRegressor(nn.Module):
+
+    def __init__(self, *input_sizes, hidden_size=128):
+        super().__init__()
+        # Creating a List of encoders for each input, this will encode each input to a common space of size hidden_size
+        self.encoders = []
+        for in_size in input_sizes:
+            self.encoders.append(nn.Linear(in_size, hidden_size))
+        # concatenating the output of all the encoders    
+        self.concat_fc = nn.Linear(len(input_sizes)*hidden_size, hidden_size)
+    
+        # Takes the final output of concat_fc and maps it to a scalar output
+        self.output_fc = nn.Linear(hidden_size, 1)
+        self.relu = nn.ReLU() # Initialize a ReLU activation function
+        
+    def forward(self, *inputs):
+        # loop over all the inputs and encode them to a common space
+        encoded_inputs = []
+        for i, encoder in enumerate(self.encoders):
+            encoded_inputs.append(self.relu(encoder(inputs[i])))
+        
+        x = torch.cat(encoded_inputs, dim=-1)
+        x = self.concat_fc(x)
+        x = self.relu(x)
+        x = self.output_fc(x)
+        return x
+
+
 if __name__ == "__main__":
-    # Test the regressor
+    print("Testing Regressor")
     x = torch.randn((32,1024))
     y = torch.rand((32,12))
     model = Regressor()
     z = model(x,y)
     print(z.shape)
+    
+    print("Testing MultiHeadRegressor")
+    x = torch.randn((32,1024))
+    y = torch.rand((32,12))
+    z = torch.rand((32, 5))
+    model = MultiHeadRegressor(1024, 12, 5, hidden_size=128)
+    w = model(x,y,z)
+    print(w.shape)
