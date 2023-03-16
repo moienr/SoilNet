@@ -1,14 +1,14 @@
 import torch
 import torch.nn as nn
-from submodules.cnn_feature_extractor import CNNFlattener
-from submodules.regressor import Regressor
+from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128
+from submodules.regressor import Regressor, MultiHeadRegressor
 
 
 
 class SoilNet(nn.Module):
     def __init__(self, input_size=1024, aux_size=12, hidden_size=128):
         super().__init__()
-        self.cnn = CNNFlattener()
+        self.cnn = CNNFlattener128()
         self.reg = Regressor()
         
     def forward(self, raster_stack, auxillary_data):
@@ -26,13 +26,14 @@ class SoilNet(nn.Module):
         output = self.reg(flat_raster,auxillary_data)
         return output
     
+    
 class SoilNetFC(nn.Module):
-    def __init__(self, input_size=1024, aux_size=12, hidden_size=128):
+    def __init__(self, regresor_input = 1024, hidden_size=128):
         super().__init__()
-        self.cnn = CNNFlattener()
-        self.reg = Regressor()
+        self.cnn = CNNFlattener64()
+        self.reg = MultiHeadRegressor(1024)
         
-    def forward(self, raster_stack, auxillary_data):
+    def forward(self, raster_stack):
         """
         Forward pass of the SoilNet module.
         
@@ -44,7 +45,7 @@ class SoilNetFC(nn.Module):
             torch.Tensor: Output tensor of shape (batch_size, 1).
         """
         flat_raster = self.cnn(raster_stack)
-        output = self.reg(flat_raster,auxillary_data)
+        output = self.reg(flat_raster)
         return output
        
     
@@ -53,11 +54,17 @@ class SoilNetFC(nn.Module):
     
     
 if __name__ == "__main__":
+    print("Testing SoilNet...")
     x = torch.randn((32,12,128,128))
     y = torch.rand((32,12))
     model = SoilNet()
     z = model(x,y)
     print(z.detach().shape)
+    print('Testing SoilNetFC...')
+    x = torch.randn((32,12,64,64))
+    model = SoilNetFC()
+    y = model(x)
+    print(y.detach().shape)
     
     
     

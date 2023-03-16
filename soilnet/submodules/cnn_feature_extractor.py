@@ -209,7 +209,7 @@ class CNNFlattener64(nn.Module):
         # Final convolutional layer to flatten output into a 1D feature vector
         self.last_conv = nn.Conv2d(in_channels,
                                    out_channels=1024,
-                                   kernel_size=2, # The only difference between this and the 128x128 version is the kernel size
+                                   kernel_size=2,
                                    stride=1,
                                    padding=0)
 
