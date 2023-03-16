@@ -74,11 +74,7 @@ class MultiHeadRegressor(nn.Module):
         
     def forward(self, *inputs):
         # loop over all the inputs and encode them to a common space
-        encoded_inputs = []
-        for i, encoder in enumerate(self.encoders):
-            encoded_inputs.append(self.relu(encoder(inputs[i])))
-        
-        x = torch.cat(encoded_inputs, dim=-1)
+        x = torch.cat([self.relu(self.encoders[i](inputs[i])) for i in range(len(inputs))], dim=-1)
         x = self.concat_fc(x)
         x = self.relu(x)
         x = self.output_fc(x)
