@@ -58,8 +58,31 @@ class Regressor(nn.Module):
     
     
 class MultiHeadRegressor(nn.Module):
+    """
+    A multi-head regressor that encodes each input to a common space of size `hidden_size` and maps the concatenated output to a scalar output.
 
-    def __init__(self, *input_sizes, hidden_size=128):
+    """
+
+    def __init__(self, *input_sizes:int, hidden_size=128):
+        """ Initializes the MultiHeadRegressor, with with a list that contains the output_size of the branches that are being inputed into the model.
+        Args:
+        -----
+        `*input_sizes` (int): The output_size of each input branch.
+        `hidden_size` (int): The size of the common space to which each input is encoded. Default: 128.
+        
+        Example:
+        --------
+        ```
+        # 32 is the barch size.
+        x = torch.randn((32,1024))
+        y = torch.rand((32,12))
+        z = torch.rand((32, 5))
+        model = MultiHeadRegressor(1024, 12, 5, hidden_size=128)
+        w = model(x,y,z)
+        print(w.shape)
+        ```
+        
+        """
         super().__init__()
         # Creating a List of encoders for each input, this will encode each input to a common space of size hidden_size
         self.encoders = []
@@ -72,11 +95,20 @@ class MultiHeadRegressor(nn.Module):
         self.output_fc = nn.Linear(hidden_size, 1)
         self.relu = nn.ReLU() # Initialize a ReLU activation function
         
-    def forward(self, *inputs):
-        # loop over all the inputs and encode them to a common space
+    def forward(self, *inputs:torch.Tensor) -> torch.Tensor:
+        """ Forward pass of the MultiHeadRegressor.
+        Args:
+        *inputs (torch.Tensor): The inputs to the model, should be of the same length as the number of input_sizes.
+        Returns:
+            torch.Tensor: The output of the model, which is a scalar value with shape (batch_size, 1).
+        """
+        # loop over all the inputs and encode them to a common space | by using list comprehension we use less memory
         x = torch.cat([self.relu(self.encoders[i](inputs[i])) for i in range(len(inputs))], dim=-1)
+        # Process the concatenated output into a common space
         x = self.concat_fc(x)
+        # Apply ReLU activation function
         x = self.relu(x)
+        # Map the output of concat_fc to a scalar output
         x = self.output_fc(x)
         return x
 
