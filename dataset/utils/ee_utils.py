@@ -220,11 +220,11 @@ def add_mineral_indices(inImage): #Please change the name of the function if nec
         ee.Image: The output image with the added bands.
     """
     # Clay Minerals = swir1 / swir2
-    clayIndex = inImage.select('SR_B6').divide(inImage.select('SR_B7')).rename('clayIndex')
-
+    #clayIndex = inImage.select('SR_B6').divide(inImage.select('SR_B7')).rename('clayIndex')
+    normClayIndex = inImage.normalizedDifference(['SR_B6','SR_B7']).rename('normClayIndex')
     # Ferrous Minerals = swir / nir
-    ferrousIndex = inImage.select('SR_B6').divide(inImage.select('SR_B5')).rename('ferrousIndex')
-
+    #ferrousIndex = inImage.select('SR_B6').divide(inImage.select('SR_B5')).rename('ferrousIndex')
+    normFerrousIndex = inImage.normalizedDifference(['SR_B6','SR_B5']).rename('normFerrousIndex')
     # Carbonate Index = (red - green) / (red + green)
     carbonateIndex = inImage.normalizedDifference(['SR_B4','SR_B3']).rename('carbonateIndex')
 
@@ -235,7 +235,7 @@ def add_mineral_indices(inImage): #Please change the name of the function if nec
     ndvi = inImage.normalizedDifference(['SR_B5', 'SR_B4']).rename('NDVI');
 
     # Add bands
-    outStack = inImage.addBands([clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex, ndvi])
+    outStack = inImage.addBands([normClayIndex, normFerrousIndex, carbonateIndex, rockOutcropIndex, ndvi])
 
     return outStack
 
