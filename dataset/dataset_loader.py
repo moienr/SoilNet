@@ -83,6 +83,10 @@ class myNormalize:
     # reshaping the image into (bands, height, width)
     img = reshape_array(img)
     
+    # IMPORTANT : Replacing NaN values with 0, Just a NAN pixel in the input image will cause the whole image to be NaN in the output
+    img[np.isnan(img)] = 0
+    
+    
     # Normalize the image : first 7 bands are Landsat SR bands, the rest are Indices
     for band_min_max in self.img_bands_min_max:
       if band_min_max[1] != (0,1): # if it is already between 0 and 1 we don't need to normalize it. 
