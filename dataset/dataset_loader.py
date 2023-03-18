@@ -6,7 +6,7 @@ import os
 from torchvision import datasets, transforms
 import pandas as pd
 
-from utils.utils import reshape_tensor, get_df_max_min, normalize
+from utils.utils import reshape_tensor, reshape_array, get_df_max_min, normalize
 
 class SNDataset(Dataset):
   def __init__(self, l8_dir, csv_dir , l8_bands: list = None ,transform = None):
@@ -54,32 +54,59 @@ class myToTensor:
         return reshape_tensor(torch.from_numpy(image)).to(dtype=self.dtype)
 
 class myNormalize:
-  def __init__(self, img_bands_min_max =[(0,1),(0,1),(0,1),(0,1),(0,1),(0,1),
-                                         (0,1),(-1,1),(-1,1),(-1,1)(-1,1),(-1,1)], oc_min = 0, oc_max = 1):
-    self.s1_min = s1_min
-    self.s1_max = s1_max
-    self.s2_min = s2_min
-    self.s2_max = s2_max
+  """Normalize the image and the target value"""
+  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)]], oc_min = 0, oc_max = 1000):
+    """
+      A class to normalize image and target value arrays.
+      
+      Args:
+      - img_bands_min_max (list): A list of tuples defining the bands to normalize and the corresponding minimum and maximum values. Default is `[(0,7),(0,1)], [(7,12),(-1,1)]`, where the first 7 bands are Landsat SR bands and the rest are indices.
+      - oc_min (int or float): The minimum value of the target array. Default is 0.
+      - oc_max (int or float): The maximum value of the target array. Default is 1000.
+      
+      Returns:
+      - A tuple containing the normalized image and target value arrays.
+    """
+    self.img_bands_min_max = img_bands_min_max
+    self.oc_min = oc_min
+    self.oc_max = oc_max
+
   def __call__(self,sample):
-    input, target = sample
-    # input image is the Sentinel 2 image which is between 0 and 1
-    input[input>1] = 1
-    input[input<0] = 0
-    input = input * 2
-    input = input - 1
-    # Target is Sentinel 1 VV image which is between -25 and 10
-#     print(np.min(target),np.max(target))
-    target[target>self.s1_max] = self.s1_max
-    target[target<self.s1_min] = self.s1_min
+    """
+    A class to normalize image and target value arrays.
+    
+    Args:
+    - img_bands_min_max (list): A list of tuples defining the bands to normalize and the corresponding minimum and maximum values. Default is `[(0,7),(0,1)], [(7,12),(-1,1)]`, where the first 7 bands are Landsat SR bands and the rest are indices.
+    - oc_min (int or float): The minimum value of the target array. Default is 0.
+    - oc_max (int or float): The maximum value of the target array. Default is 1000.
+    
+    Returns:
+    - A tuple containing the normalized image and target value arrays.
+    """
+    img, oc = sample
+    
+    # reshaping the image into (bands, height, width)
+    img = reshape_array(img)
+    
+    # Normalize the image : first 7 bands are Landsat SR bands, the rest are Indices
+    for band_min_max in self.img_bands_min_max:
+      if band_min_max[1] != (0,1): # if it is already between 0 and 1 we don't need to normalize it. 
+        img[band_min_max[0][0]:band_min_max[0][1]] = normalize(img[band_min_max[0][0]:band_min_max[0][1]], band_min_max[1][0], band_min_max[1][1])
+        
+        
+    # Normalize the target value
+    oc = normalize(oc, self.oc_min, self.oc_max)
+    
 
-    # Normalizing the Senitnel 1 data between -1 and 1 
-    target += np.abs(self.s1_min)
-    target = target/(np.abs(self.s1_max) + np.abs(self.s1_min))
-    target = target * 2
-    target = target - 1
+    
+    # Cutting out of range Vlaues
+    img[img > 1] = 1
+    img[img < 0] = 0
+    oc = oc if oc < 1 else 1
+    oc = oc if oc > 0 else 0
 
 
-    return input, target  
+    return img, oc  
 
 
 if __name__ == "__main__":
@@ -88,3 +115,16 @@ if __name__ == "__main__":
     x = ds[0]
     print('OC: ', x[1], type(x[1]))
     print('image shape: ',x[0].shape , x[0].dtype)
+    
+    
+    # Testing the transforms
+    print('Testing MyNormalize...')
+    mynorm = myNormalize()
+    rand_img = np.random.rand(100,100,12)
+    rand_img[7:12] = rand_img[7:12] * 2 - 1
+    rand_oc = np.random.rand(1) * 1000
+    y = mynorm((rand_img, rand_oc))
+    print('OC: ', y[1], type(y[1]))
+    print('image shape: ',y[0].shape , y[0].dtype , np.min(y[0]), np.max(y[0]) , sep=" | ")
+    
+    
