@@ -55,7 +55,7 @@ class Regressor(nn.Module):
 
 
     
-    
+#TODO: FIX : https://pytorch.org/docs/stable/generated/torch.nn.ModuleList.html
     
 class MultiHeadRegressor(nn.Module):
     """
@@ -114,17 +114,28 @@ class MultiHeadRegressor(nn.Module):
 
 
 if __name__ == "__main__":
-    print("Testing Regressor")
-    x = torch.randn((32,1024))
-    y = torch.rand((32,12))
-    model = Regressor()
+    print('Checking device: ')
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print("Testing Regressor...")
+    x = torch.randn((32,1024)).to(device)
+    y = torch.rand((32,12)).to(device)
+    model = Regressor().to(device)
     z = model(x,y)
     print(z.shape)
     
-    print("Testing MultiHeadRegressor")
-    x = torch.randn((32,1024))
-    y = torch.rand((32,12))
-    z = torch.rand((32, 5))
-    model = MultiHeadRegressor(1024, 12, 5, hidden_size=128)
+    print("Testing MultiHeadRegressor...")
+    x = torch.randn((32,1024)).to(device)
+    y = torch.rand((32,12)).to(device)
+    z = torch.rand((32, 5)).to(device)
+    model = MultiHeadRegressor(1024, 12, 5, hidden_size=128).to(device)
+
     w = model(x,y,z)
     print(w.shape)
+    
+    # model = MultiHeadRegressor(1024, 12, 5, hidden_size=128).to(device)
+    # for param in model.parameters():
+    #     print(param.name, param.shape, param.device)
+    # print("---------------------")
+    # for buffer in model.buffers():
+    #     print(buffer.name, buffer.shape, buffer.device)
+    
