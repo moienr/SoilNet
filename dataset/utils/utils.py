@@ -120,19 +120,67 @@ def create_folder_if_not_exists(folder_name):
         print(f'Folder "{folder_name}" created in the current working directory.')
     else:
         print(f'Folder "{folder_name}" already exists in the current working directory.')
+        
+import torch
+def reshape_tensor(tensor: torch.Tensor) -> torch.Tensor:
+    """Takes in a pytorch tensor and reshapes it to (C,H,W) if it is not already in that shape.
+    
+    This Algorithm won't work if C is larger than H or W
+    We assume that the smallest dimension is the channel dimension.
+    """
+    if tensor.dim() == 2: # If it is a 2D image we need to add a channel dimension
+        tensor = tensor.unsqueeze(0)
+    elif tensor.dim() == 3 and tensor.shape[2] < tensor.shape[0]: # if it is a 3D image and 3rd dim is smallest, it means it it the channel so we permute
+        tensor = tensor.permute((2,0,1))
+    elif tensor.dim() == 3 and tensor.shape[2] > tensor.shape[0]: # if it is a 3D image and and the first dimension is smaller than others it means its the C and we don't need to permute.
+        pass
+    else:
+        raise ValueError(f"Input tensor shape is unvalid: {tensor.shape}")
+    return tensor
+
+def reshape_array(array: np.ndarray) -> np.ndarray:
+    """Takes in an array and reshapes it to (C,H,W) if it is not already in that shape.
+    
+    This Algorithm won't work if C is larger than H or W
+    We assume that the smallest dimension is the channel dimension.
+    """
+    if array.ndim == 2: # If it is a 2D image we need to add a channel dimension
+        array = np.expand_dims(array, axis=0)
+    elif array.ndim == 3 and array.shape[2] < array.shape[0]: # if it is a 3D image and 3rd dim is smallest, it means it it the channel so we permute
+        array = np.swapaxes(array, 0, 2)
+        array = np.swapaxes(array, 1, 2)
+    elif array.ndim == 3 and array.shape[2] > array.shape[0]: # if it is a 3D image and and the first dimension is smaller than others it means its the C and we don't need to permute.
+        pass
+    else:
+        raise ValueError(f"Input array shape is invalid: {array.shape}")
+    return array
 
 # Define the function
-def get_df_max_min(df, col):
-  # Check if the input is a pandas dataframe and the column name is valid
-  if isinstance(df, pd.DataFrame) and col in df.columns:
-    # Get the maximum and minimum values of the column as floats
-    max_val = float(df[col].max())
-    min_val = float(df[col].min())
-    # Return a tuple of the maximum and minimum values
-    return (min_val,max_val)
-  else:
-    # Raise an exception if the input is invalid
-    raise ValueError("Invalid input. Please provide a pandas dataframe and a valid column name.")
+def get_df_max_min(df:pd.DataFrame, col):
+    """Takes in a pandas dataframe and a column name and returns a tuple of the maximum and minimum values of the column.
+
+    Args:
+        df (pd.DataFrame)
+        col: The name of the column to get the maximum and minimum values of.
+
+    Returns:
+        tuple: A tuple of the maximum and minimum values of the column.
+    """
+    # Check if the input is a pandas dataframe and the column name is valid
+    if isinstance(df, pd.DataFrame) and col in df.columns:
+        # Get the maximum and minimum values of the column as floats
+        max_val = float(df[col].max())
+        min_val = float(df[col].min())
+        # Return a tuple of the maximum and minimum values
+        return (min_val,max_val)
+    else:
+        # Raise an exception if the input is invalid
+        raise ValueError("Invalid input. Please provide a pandas dataframe and a valid column name.")
+    
+def normalize(value,min,max):
+    """Takes in a value, min and max of the data| returns the normalized value between 0 and 1.
+    """
+    return (value - min) / (max - min)
 
 
 
