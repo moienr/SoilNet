@@ -45,13 +45,6 @@ class SNDataset(Dataset):
     return l8_img,oc
   
   
-class myToTensor:
-    def __init__(self,dtype=torch.float32):
-        self.dtype = dtype
-  
-    def __call__(self,sample):
-        image, oc = sample
-        return reshape_tensor(torch.from_numpy(image)).to(dtype=self.dtype)
 
 class myNormalize:
   """Normalize the image and the target value"""
@@ -60,9 +53,11 @@ class myNormalize:
       A class to normalize image and target value arrays.
       
       Args:
-      - img_bands_min_max (list): A list of tuples defining the bands to normalize and the corresponding minimum and maximum values. Default is `[(0,7),(0,1)], [(7,12),(-1,1)]`, where the first 7 bands are Landsat SR bands and the rest are indices.
-      - oc_min (int or float): The minimum value of the target array. Default is 0.
-      - oc_max (int or float): The maximum value of the target array. Default is 1000.
+      - `img_bands_min_max` (list): A list of tuples defining the bands to normalize and the corresponding minimum and maximum values. Default is [(0,7),(0,1)], [(7,12),(-1,1)], where the first 7 bands are Landsat SR bands and the rest are indices.
+      
+             `[(from_band, to_band),(min_of_bands , max_of_bands)]`
+      - `oc_min` (int or float): The minimum value of the target array. Default is 0.
+      - `oc_max` (int or float): The maximum value of the target array. Default is 1000.
       
       Returns:
       - A tuple containing the normalized image and target value arrays.
@@ -109,6 +104,19 @@ class myNormalize:
     return img, oc  
 
 
+class myToTensor:
+    def __init__(self,dtype=torch.float32, ouput_size = (64,64)):
+        self.dtype = dtype
+        self.resize = transforms.Resize(ouput_size)
+    def __call__(self,sample):
+        image, oc = sample
+        return (self.resize(reshape_tensor(torch.from_numpy(image))).to(dtype=self.dtype), torch.tensor(oc).to(dtype=self.dtype))
+
+
+
+
+
+
 if __name__ == "__main__":
     ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\','D:\python\SoilNet\dataset\LUCAS_2015_Germany_all.csv')
     print(len(ds))
@@ -118,13 +126,18 @@ if __name__ == "__main__":
     
     
     # Testing the transforms
-    print('Testing MyNormalize...')
+    print('Testing MyTransfroms...')
     mynorm = myNormalize()
     rand_img = np.random.rand(100,100,12)
     rand_img[7:12] = rand_img[7:12] * 2 - 1
     rand_oc = np.random.rand(1) * 1000
-    y = mynorm((rand_img, rand_oc))
+    
+    my_to_tensor = myToTensor()
+    
+    transform = transforms.Compose([mynorm, my_to_tensor])
+    
+    y = transform((rand_img, rand_oc))
     print('OC: ', y[1], type(y[1]))
-    print('image shape: ',y[0].shape , y[0].dtype , np.min(y[0]), np.max(y[0]) , sep=" | ")
+    print('image shape: ',y[0].shape , y[0].dtype , torch.min(y[0]), torch.max(y[0]) , sep=" | ")
     
     
