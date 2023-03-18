@@ -232,7 +232,7 @@ def add_mineral_indices(inImage): #Please change the name of the function if nec
     rockOutcropIndex = inImage.normalizedDifference(['SR_B6','SR_B3']).rename('rockOutcropIndex')
     
     # NDVI Index = (Band 5 – Band 4) / (Band 5 + Band 4) 
-    ndvi = inImage.normalizedDifference(['SR_B5', 'SR_B4']).rename('NDVI');
+    ndvi = inImage.normalizedDifference(['SR_B5', 'SR_B4']).rename('NDVI')
 
     # Add bands
     outStack = inImage.addBands([normClayIndex, normFerrousIndex, carbonateIndex, rockOutcropIndex, ndvi])
