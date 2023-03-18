@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch.nn import ModuleList
 
 class Regressor(nn.Module):
     """A simple regressor that takes in a 1024 dimensional vector and a 12 dimensional vector and outputs a single value.
@@ -85,9 +86,10 @@ class MultiHeadRegressor(nn.Module):
         """
         super().__init__()
         # Creating a List of encoders for each input, this will encode each input to a common space of size hidden_size
-        self.encoders = []
-        for in_size in input_sizes:
-            self.encoders.append(nn.Linear(in_size, hidden_size))
+        # NOTE: We should not use normal list to hold pytorch modules as it will not be registered as a submodule of the model.
+        # This is the reason we were getting error when setting the modle to device, the models inside the list were not registered as submodules,
+        # therfore they were not moved to the device.
+        self.encoders = ModuleList([nn.Linear(in_size, hidden_size) for in_size in input_sizes])
         # concatenating the output of all the encoders    
         self.concat_fc = nn.Linear(len(input_sizes)*hidden_size, hidden_size)
     
