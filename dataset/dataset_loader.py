@@ -33,14 +33,14 @@ class SNDataset(Dataset):
     row = df[df['Point_ID'] == int(point_id)]
     oc = row['OC'].values[0]
     
-    
+
     l8_img = io.imread(l8_img_path)
     if self.l8_bands: l8_img = l8_img[self.l8_bands,:,:]
 
 
 
     if self.transform:
-        l8_img  = self.transform(l8_img)
+        l8_img,oc  = self.transform((l8_img,oc))
         
     return l8_img,oc
   
@@ -113,12 +113,8 @@ class myToTensor:
         return (self.resize(reshape_tensor(torch.from_numpy(image))).to(dtype=self.dtype), torch.tensor(oc).to(dtype=self.dtype))
 
 
-
-
-
-
 if __name__ == "__main__":
-    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\','D:\python\SoilNet\dataset\LUCAS_2015_Germany_all.csv')
+    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_Germany_all.csv')
     print(len(ds))
     x = ds[0]
     print('OC: ', x[1], type(x[1]))
@@ -139,5 +135,12 @@ if __name__ == "__main__":
     y = transform((rand_img, rand_oc))
     print('OC: ', y[1], type(y[1]))
     print('image shape: ',y[0].shape , y[0].dtype , torch.min(y[0]), torch.max(y[0]) , sep=" | ")
+    
+    
+    print("Testing the dataset with transforms...")
+    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_Germany_all.csv',transform=transform)
+    x = ds[0]
+    print('OC: ', x[1], type(x[1]))
+    print('image shape: ',x[0].shape , x[0].dtype)
     
     
