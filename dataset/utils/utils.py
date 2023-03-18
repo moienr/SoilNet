@@ -121,8 +121,7 @@ def create_folder_if_not_exists(folder_name):
     else:
         print(f'Folder "{folder_name}" already exists in the current working directory.')
         
-import torch
-def reshape_tensor(tensor: torch.Tensor) -> torch.Tensor:
+def reshape_tensor(tensor):
     """Takes in a pytorch tensor and reshapes it to (C,H,W) if it is not already in that shape.
     
     This Algorithm won't work if C is larger than H or W
