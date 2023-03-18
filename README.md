@@ -11,10 +11,9 @@
 
 ### MODEL
 - Add Spatial Attention Module
-- FCNN + Regressor
+- ~~FCNN + Regressor~~
 - FCNN + SA + Regressor
 
 ### DATASET
-- Add TerraClimate Dataset
+- ~~Add TerraClimate Dataset~~
 - Write SRTM + Slope dataset donwlaoder
-
