@@ -221,10 +221,10 @@ def add_mineral_indices(inImage): #Please change the name of the function if nec
     """
     # Clay Minerals = swir1 / swir2
     #clayIndex = inImage.select('SR_B6').divide(inImage.select('SR_B7')).rename('clayIndex')
-    normClayIndex = inImage.normalizedDifference(['SR_B6','SR_B7']).rename('normClayIndex')
+    normClayIndex = inImage.normalizedDifference(['SR_B6','SR_B7']).rename('clayIndex')
     # Ferrous Minerals = swir / nir
     #ferrousIndex = inImage.select('SR_B6').divide(inImage.select('SR_B5')).rename('ferrousIndex')
-    normFerrousIndex = inImage.normalizedDifference(['SR_B6','SR_B5']).rename('normFerrousIndex')
+    normFerrousIndex = inImage.normalizedDifference(['SR_B6','SR_B5']).rename('ferrousIndex')
     # Carbonate Index = (red - green) / (red + green)
     carbonateIndex = inImage.normalizedDifference(['SR_B4','SR_B3']).rename('carbonateIndex')
 
