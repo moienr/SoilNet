@@ -121,9 +121,26 @@ def create_folder_if_not_exists(folder_name):
     else:
         print(f'Folder "{folder_name}" already exists in the current working directory.')
 
+# Define the function
+def get_df_max_min(df, col):
+  # Check if the input is a pandas dataframe and the column name is valid
+  if isinstance(df, pd.DataFrame) and col in df.columns:
+    # Get the maximum and minimum values of the column as floats
+    max_val = float(df[col].max())
+    min_val = float(df[col].min())
+    # Return a tuple of the maximum and minimum values
+    return (min_val,max_val)
+  else:
+    # Raise an exception if the input is invalid
+    raise ValueError("Invalid input. Please provide a pandas dataframe and a valid column name.")
+
+
+
 if __name__ == '__main__':
-    #test_function(get_square_roi, 40.02, -105.25, roi_size=1920)
-    #test_function(correct_image_shape,True,  np.random.rand(3, 256, 256))
-    df = read_csv('D:\\python\\SoilNet\\dataset\\utils\\test.csv')
+    # Create an example dataframe with some numeric columns
+    df = pd.DataFrame({"A": [1, 2, 3, 4], "B": [5.6, 7.8, 9.0, 10.2], "C": [-1.2, -3.4, -5.6, -7.8]})
+
+    # Test the function on column A and print the result
+    print(get_df_max_min(df, "B"))
     print(df)
-    
+    # Expected output: (4.0, 1.0)
