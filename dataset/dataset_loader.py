@@ -48,7 +48,7 @@ class SNDataset(Dataset):
 
 class myNormalize:
   """Normalize the image and the target value"""
-  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)]], oc_min = 0, oc_max = 1000):
+  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)]], oc_min = 0, oc_max = 200):
     """
       A class to normalize image and target value arrays.
       
