@@ -255,7 +255,7 @@ def add_topo():
     
     #get % slope
     slopeDeg = topo.select(1)
-    slopeRads = slopeDeg.multiply(math.PI).divide(ee.Number(180));
+    slopeRads = slopeDeg.multiply(math.pi).divide(ee.Number(180));
     slopeTan = slopeRads.tan();
     slopePCT = slopeTan.multiply(ee.Number(100)).rename('slopePCT');
     
