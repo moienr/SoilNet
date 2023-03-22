@@ -239,6 +239,36 @@ def add_mineral_indices(inImage): #Please change the name of the function if nec
 
     return outStack
 
+def add_topo(inImage): 
+    """
+    Adds topographical information, elevation and slope.
+    
+    Parameters:
+        inImage (ee.Image): The input image to add the new bands to.
+        
+    Returns:
+        ee.Image: The output image with the added bands.
+    """
+    #Function to add USGS 1/3 arc second topography and derive slope, aspect
+  
+    elevation = ee.Image("USGS/SRTMGL1_003"); #Global DEM
+    
+    topo = ee.Algorithms.Terrain(elevation);
+  
+    
+    #get % slope
+    slopeDeg = topo.select(1)
+    slopeRads = slopeDeg.multiply(Math.PI).divide(ee.Number(180));
+    slopeTan = slopeRads.tan();
+    slopePCT = slopeTan.multiply(ee.Number(100)).rename('slopePCT');
+    
+    #Add topography bands to image composite
+    topo = topo.float()
+   
+    topo = topo.select('elevation').addBands(slopePCT)
+    
+    return topo
+
 
 def get_closest_image(image_collection:ee.ImageCollection, date:str, clip_dates: int = None) -> ee.Image:
     """
