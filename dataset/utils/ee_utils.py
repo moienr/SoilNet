@@ -239,7 +239,7 @@ def add_mineral_indices(inImage): #Please change the name of the function if nec
 
     return outStack
 
-def add_topo(inImage): 
+def add_topo(): 
     """
     Adds topographical information, elevation and slope.
     
