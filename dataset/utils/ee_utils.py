@@ -252,9 +252,7 @@ def add_topo(inImage):
     #Function to add USGS 1/3 arc second topography and derive slope, aspect
   
     elevation = ee.Image("USGS/SRTMGL1_003"); #Global DEM
-    
     topo = ee.Algorithms.Terrain(elevation);
-  
     
     #get % slope
     slopeDeg = topo.select(1)
@@ -264,7 +262,6 @@ def add_topo(inImage):
     
     #Add topography bands to image composite
     topo = topo.float()
-   
     topo = topo.select('elevation').addBands(slopePCT)
     
     return topo
