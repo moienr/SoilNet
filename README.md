@@ -16,5 +16,5 @@
 
 ### DATASET
 - ~~Add TerraClimate Dataset~~
-- Write SRTM + Slope dataset donwlaoder
+- ~~Write SRTM + Slope dataset donwlaoder~~
 ![oc](https://github.com/moienr/SoilNet/blob/da789f2bf2f2df5dacca6b44ea2be63ed516e54f/dataset/oc_histogram.png)
