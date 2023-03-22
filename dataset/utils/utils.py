@@ -20,6 +20,15 @@ def correct_image_shape(image):
 
 import pandas as pd
 def read_csv(csv_path):
+    """
+    Read a CSV file from the specified path and return a Pandas DataFrame with the first column dropped.
+
+    Parameters:
+    csv_path (str): The path to the CSV file to read.
+
+    Returns:
+    pandas.DataFrame: A DataFrame with the first column dropped (since it is index) and columns `1,2,3` renamed as `'Point_id', 'long',` and `'lat'`.
+    """
     # read csv file into a pandas dataframe
     df = pd.read_csv(csv_path)
     # first column is the index, so we drop it
