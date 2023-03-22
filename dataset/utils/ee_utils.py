@@ -253,13 +253,13 @@ def add_topo():
     """
     
     elevation = ee.Image("USGS/SRTMGL1_003"); #Global DEM
-    topo = ee.Algorithms.Terrain(elevation);
+    topo = ee.Algorithms.Terrain(elevation)
     
     #get % slope
     slopeDeg = topo.select(1)
-    slopeRads = slopeDeg.multiply(math.pi).divide(ee.Number(180));
-    slopeTan = slopeRads.tan();
-    slopePCT = slopeTan.multiply(ee.Number(100)).rename('slopePCT');
+    slopeRads = slopeDeg.multiply(math.pi).divide(ee.Number(180))
+    slopeTan = slopeRads.tan()
+    slopePCT = slopeTan.multiply(ee.Number(100)).rename('slopePCT')
     
     #Add topography bands to image composite
     topo = topo.float()
