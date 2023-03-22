@@ -249,8 +249,7 @@ def add_topo(inImage):
     Returns:
         ee.Image: The output image with the added bands.
     """
-    #Function to add USGS 1/3 arc second topography and derive slope, aspect
-  
+    
     elevation = ee.Image("USGS/SRTMGL1_003"); #Global DEM
     topo = ee.Algorithms.Terrain(elevation);
     
