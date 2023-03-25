@@ -35,7 +35,7 @@ class RNN(nn.Module):
         - out (torch.Tensor): the output tensor of shape (batch_size, num_classes)
         """
         # Set initial hidden states
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) 
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) .to(device)
         # x: (n, seq, input), 
         # h0: (rnn_layers, n, hiden_size)
         
@@ -82,7 +82,7 @@ class GRU(nn.Module):
         - out (torch.Tensor): the output tensor of shape (batch_size, num_classes)
         """
         # Set initial hidden states
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) 
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) .to(device)
         # x: (n, seq, input), 
         # h0: (gru_layers, n, hiden_size)
         
