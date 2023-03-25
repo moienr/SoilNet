@@ -118,9 +118,10 @@ if __name__ == "__main__":
     print(y.detach().shape)
     
     print("Testing SoilNetMonoLSTM...")
-    x_cnn = torch.randn((32,12,64,64))
-    x_lstm = torch.randn((32, 12, 10))
-    model = SoilNetMonoLSTM(cnn_in_channels=12, lstm_n_features=10)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Check if GPU is available
+    x_cnn = torch.randn((32,12,64,64)).to(device)
+    x_lstm = torch.randn((32, 12, 10)).to(device)
+    model = SoilNetMonoLSTM(cnn_in_channels=12, lstm_n_features=10).to(device)
     y= model(x_cnn, x_lstm)
     print(y.detach().shape)
     
