@@ -136,22 +136,19 @@ class LSTM(nn.Module):
 
         """
 
-        # Set initial hidden states and cell states for LSTM
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) 
-        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)
-        # x: (n, seq, input), 
-        # h0 & c0: (lstm_layers, n, hiden_size)
-        
+        # Set initial hidden states and cell states for LSTM | the deufault is zero so we could skip this step
+        # h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device) # x: (n, seq, input)
+        # c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device) # h0 & c0: (lstm_layers, n, hiden_size)
+
         # Forward propagate LSTM
-        out, _ = self.lstm(x, (h0,c0))  
-        # out: tensor of shape (batch_size, seq_length, hidden_size)
+        out, _ = self.lstm(x)   # out: tensor of shape (batch_size, seq_length, hidden_size)
+        #out, _ = self.lstm(x, (h0,c0))  # if h0 and c0 are defined, we need to pass them to the forward function
         
         # Decode the hidden state of the last time step
-        out = out[:, -1, :]
-        # out: (n, 128)
-         
-        out = self.fc(out)
-        # out: (n, 10)
+        out = out[:, -1, :] # out: (n, 128)
+        
+        out = self.fc(out) # out: (n, 10)
+        
         return out
 
 if __name__ == '__main__':
@@ -170,7 +167,8 @@ if __name__ == '__main__':
     
     
     print("Testing LSTM...")
-    model = LSTM(1, 128, 2, 16)
-    x = torch.randn(32, 60, 1)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Check if GPU is available
+    model = LSTM(10, 128, 2, 64).to(device)  # Move the model to the device
+    x = torch.randn(32, 12, 10).to(device)  # Move the input tensor to the device
     y = model(x)
     print(y.shape)
