@@ -101,6 +101,7 @@ class GRU(nn.Module):
     
     
 class LSTM(nn.Module):
+    """LSTM model for time series regression."""
 
     def __init__(self, input_size, hidden_size, num_layers, output_size):
         """

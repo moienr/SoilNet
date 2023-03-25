@@ -60,7 +60,7 @@ class Regressor(nn.Module):
     
 class MultiHeadRegressor(nn.Module):
     """
-    A multi-head regressor that encodes each input to a common space of size `hidden_size` and maps the concatenated output to a scalar output.
+    A multi-head regressor that can take any number of input from branchesa and encodes each input to a common space of size `hidden_size` and maps the concatenated output to a scalar output.
 
     """
 

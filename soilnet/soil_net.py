@@ -50,7 +50,29 @@ class SoilNetFC(nn.Module):
     
 
 class SoilNetMonoLSTM(nn.Module):
+    """
+    SoilNetMonoLSTM: A PyTorch module for multi-task regression on soil data using a combination of a convolutional neural
+    network and a long short-term memory (LSTM) network.
+    """
     def __init__(self, cnn_in_channels = 14 ,lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, cnn_out = 1024, hidden_size=128):
+        """
+        SoilNetMonoLSTM: A PyTorch module for multi-task regression on soil data using a combination of a convolutional neural
+        network and a long short-term memory (LSTM) network.
+
+        Args
+        ----
+            `cnn_in_channels` (int): The number of input image channels for the CNNFlattener Module (default: 14).
+            `lstm_n_features` (int): The number of features in the input to the LSTM (default: 10).
+            `lstm_n_layers` (int): The number of layers in the LSTM (default: 2).
+            `lstm_out` (int): The number of output features in the LSTM (default: 128).
+            `cnn_out` (int): The number of output features from the CNNFlatnner (default: 1024).
+            `hidden_size` (int): The size of the hidden state in the LSTM (default: 128).
+
+        Outputs
+        -------
+            - output (torch.Tensor): A tensor of shape `(batch_size, 1)` representing the predicted output for each
+            task in the multi-task regression problem.
+        """
         super().__init__()
         self.cnn = CNNFlattener64(cnn_in_channels) 
         self.lstm = rnn.LSTM(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
@@ -58,15 +80,18 @@ class SoilNetMonoLSTM(nn.Module):
         
     def forward(self, raster_stack, ts_features):
         """
-        Forward pass of the SoilNet module.
-        
-        Args:
-            raster_stack (torch.Tensor): Input tensor of shape (batch_size, channels, height, width).
-            auxillary_data (torch.Tensor): Auxiliary input tensor of shape (batch_size, aux_size).
-        
-        Returns:
-            torch.Tensor: Output tensor of shape (batch_size, 1).
+        Inputs
+        ------
+            - `raster_stack` (torch.Tensor): A 4D tensor of shape `(batch_size, channels, height, width)` representing a stack of
+            raster images.
+            - `ts_features` (torch.Tensor): A 3D tensor of shape `(batch_size, seq_length, , n_features)` representing a sequence
+            of time-series features. | `seq_length` is the number of time steps in the sequence. e.g. months in our climate data
+            
+        Outputs
+        -------
+            - output (torch.Tensor): A tensor of shape `(batch_size, 1)` representing the predicted output of regression.
         """
+
         flat_raster = self.cnn(raster_stack)
         lstm_output = self.lstm(ts_features)
         output = self.reg(flat_raster, lstm_output)
