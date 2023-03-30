@@ -26,7 +26,12 @@ class SNDataset(Dataset):
     climate_csvs = [f for f in os.listdir(climate_csvs_dir) if os.path.isfile(os.path.join(climate_csvs_dir, f)) and f.endswith('.csv')]
     self.climate_df_list = []
     for climate_csv in climate_csvs:
-      self.climate_df_list.append(pd.read_csv(os.path.join(climate_csvs_dir, climate_csv)))
+        self.climate_df_list.append(pd.read_csv(os.path.join(climate_csvs_dir, climate_csv)))
+        
+    # finding min and max of each df
+    self.min_max = []
+    for df in self.climate_df_list:
+        self.min_max.append((df.values.min(), df.values.max()))
 
 
   def __len__(self):
@@ -41,16 +46,23 @@ class SNDataset(Dataset):
     row = self.df_oc[self.df_oc['Point_ID'] == int(point_id)]
     oc = row['OC'].values[0]
 
-    climate_row_list = [climate_row for climate_row in self.climate_df_list if climate_row['Point_ID'] == int(point_id)]
+    climate_row_list = [df[df['Point_ID'] == int(point_id)] for df in self.climate_df_list]
+    climate_row_vals = [row.iloc[:, 1:13].values[0] for row in climate_row_list]
+    climate_stcked_array = np.stack(climate_row_vals)
+    climate_array = climate_stcked_array.T # LSTM expects the input to be (batch_size, seq_len, input_size)
     
 
     l8_img = io.imread(l8_img_path)
+    
+    if self.transform:
+      l8_img,oc  = self.transform((l8_img,oc))
+    
+    
     if self.l8_bands: l8_img = l8_img[self.l8_bands,:,:]
 
 
 
-    if self.transform:
-        l8_img,oc  = self.transform((l8_img,oc))
+
         
     return l8_img,oc
   
