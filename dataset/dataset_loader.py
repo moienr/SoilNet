@@ -118,7 +118,7 @@ class myToTensor:
 
 
 if __name__ == "__main__":
-    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_Germany_all.csv')
+    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv')
     print(len(ds))
     x = ds[0]
     print('OC: ', x[1], type(x[1]))
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     
     
     print("Testing the dataset with transforms...")
-    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_Germany_all.csv',transform=transform)
+    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv',transform=transform)
     x = ds[0]
     print('OC: ', x[1], type(x[1]))
     print('image shape: ',x[0].shape , x[0].dtype)
