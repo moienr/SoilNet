@@ -48,12 +48,13 @@ class SNDataset(Dataset):
 
 class myNormalize:
   """Normalize the image and the target value"""
-  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)]], oc_min = 0, oc_max = 200):
+  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)], [(12), (-4,2963)], [(13), (0, 90)]], oc_min = 0, oc_max = 200):
     """
       A class to normalize image and target value arrays.
       
       Args:
-      - `img_bands_min_max` (list): A list of tuples defining the bands to normalize and the corresponding minimum and maximum values. Default is [(0,7),(0,1)], [(7,12),(-1,1)], where the first 7 bands are Landsat SR bands and the rest are indices.
+      - `img_bands_min_max` (list): A list of tuples defining the bands to normalize and the corresponding minimum and maximum values.
+            * Default is `[(0,7),(0,1)], [(7,12),(-1,1), [(12), (-4,2963)],[(13), (0, 90)]]`, where the first 7 bands are Landsat SR bands and the rest are indices. band 12 is SRTM and band 13 is slope
       
              `[(from_band, to_band),(min_of_bands , max_of_bands)]`
       - `oc_min` (int or float): The minimum value of the target array. Default is 0.
@@ -90,9 +91,12 @@ class myNormalize:
     # Normalize the image : first 7 bands are Landsat SR bands, the rest are Indices
     for band_min_max in self.img_bands_min_max:
       if band_min_max[1] != (0,1): # if it is already between 0 and 1 we don't need to normalize it. 
-        img[band_min_max[0][0]:band_min_max[0][1]] = normalize(img[band_min_max[0][0]:band_min_max[0][1]], band_min_max[1][0], band_min_max[1][1])
-        
-        
+        if isinstance(band_min_max[0], tuple): # if it is a range of bands
+          img[band_min_max[0][0]:band_min_max[0][1]] = normalize(img[band_min_max[0][0]:band_min_max[0][1]], band_min_max[1][0], band_min_max[1][1])
+        elif isinstance(band_min_max[0], int): # if it is a single band
+          img[band_min_max[0]] = normalize(img[band_min_max[0]], band_min_max[1][0], band_min_max[1][1])
+        else: # if it is not a tuple or an int
+          raise ValueError('The first element of the tuple must be a tuple or an int')
     # Normalize the target value
     oc = normalize(oc, self.oc_min, self.oc_max)
     
