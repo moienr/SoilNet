@@ -28,10 +28,10 @@ class SoilNet(nn.Module):
     
     
 class SoilNetFC(nn.Module):
-    def __init__(self, cnn_in_channels = 14 ,regresor_input = 1024, hidden_size=128):
+    def __init__(self, cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, hidden_size=128):
         super().__init__()
-        self.cnn = CNNFlattener64()
-        self.reg = MultiHeadRegressor(regresor_input, hidden_size= hidden_size)
+        self.cnn = CNNFlattener64(in_channels=cnn_in_channels)
+        self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
         
     def forward(self, raster_stack):
         """
