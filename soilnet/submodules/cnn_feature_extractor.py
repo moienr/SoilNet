@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 from channel_attention import ChannelAttention
+import torchvision.models as models
+
 
 class CNNBlock(nn.Module):
     """
@@ -229,6 +231,22 @@ class CNNFlattener64(nn.Module):
         x = self.last_conv(x).squeeze(-1).squeeze(-1) # flatten the output, don't just use squeeze() because it will remove the batch dimension if it is 1
         return x
     
+  
+class ResNet101(nn.Module):
+    def __init__(self, in_channels=14 ,out_nodes=1000):
+        super(ResNet101, self).__init__()
+        self.resnet = models.resnet101(weights=None)
+        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
+                               bias=False)
+        self.relu = nn.LeakyReLU()
+        self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
+    def forward(self, x):
+        x = self.resnet(x)
+        x = self.relu(x)
+        return x
+
+  
+  
     
 def test_cnn_flattener(ClassToTest=CNNFlattener64, image_size=64):
     """
@@ -238,6 +256,14 @@ def test_cnn_flattener(ClassToTest=CNNFlattener64, image_size=64):
     cnn_flattener = ClassToTest()
     output = cnn_flattener(x)
     print(output.shape)
+    
+
+def test_resne101():
+    x = torch.randn((16, 14, 64, 64))
+    resnet = ResNet101()
+    output = resnet(x)
+    print(output.shape)
+    
 
 
 
@@ -247,3 +273,9 @@ if __name__ == "__main__": # testing the model
     test_cnn_block()
     print("Testing CNNFlattener...")
     test_cnn_flattener()
+    print("Testing Resnet...")
+    test_resne101()
+    
+    resnet = ResNet101()
+    from torchinfo import summary
+    summary(resnet, input_size=(16, 14, 64, 64), device="cpu")
