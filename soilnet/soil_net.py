@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128
+from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128, ResNet101
 from submodules.regressor import Regressor, MultiHeadRegressor
 from submodules import rnn
 
@@ -97,8 +97,30 @@ class SoilNetMonoLSTM(nn.Module):
         output = self.reg(flat_raster, lstm_output)
         return output
     
+
+class ResNet(nn.Module):
+    def __init__(self, resnet_architecture = "101" ,cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, hidden_size=128):
+        super().__init__()
+        if resnet_architecture == "101":
+            self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
+        
+    def forward(self, raster_stack):
+        """
+        Forward pass of the Resnet module.
+        
+        Args:
+            raster_stack (torch.Tensor): Input tensor of shape (batch_size, channels, height, width).
+            auxillary_data (torch.Tensor): Auxiliary input tensor of shape (batch_size, aux_size).
+        
+        Returns:
+            torch.Tensor: Output tensor of shape (batch_size, 1).
+        """
+        flat_raster = self.cnn(raster_stack)
+        output = self.reg(flat_raster)
+        return output
+        
     
-       
     
     
     
@@ -125,6 +147,10 @@ if __name__ == "__main__":
     y= model(x_cnn, x_lstm)
     print(y.detach().shape)
     
-    
+    print("Testing Resnet...")
+    x = torch.randn((32,12,64,64))
+    model = ResNet(cnn_in_channels=12)
+    y = model(x)
+    print(y.detach().shape)
     
     
