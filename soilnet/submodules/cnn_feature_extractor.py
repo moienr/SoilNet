@@ -233,7 +233,7 @@ class CNNFlattener64(nn.Module):
     
   
 class ResNet101(nn.Module):
-    def __init__(self, in_channels=14 ,out_nodes=1000):
+    def __init__(self, in_channels=14 ,out_nodes=1024):
         super(ResNet101, self).__init__()
         self.resnet = models.resnet101(weights=None)
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
