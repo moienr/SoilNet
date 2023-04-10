@@ -64,12 +64,13 @@ class MultiHeadRegressor(nn.Module):
 
     """
 
-    def __init__(self, *input_sizes:int, hidden_size=128):
+    def __init__(self, *input_sizes:int, hidden_size=128, activation = "sigmoid" ):
         """ Initializes the MultiHeadRegressor, with with a list that contains the output_size of the branches that are being inputed into the model.
         Args:
         -----
         `*input_sizes` (int): The output_size of each input branch.
         `hidden_size` (int): The size of the common space to which each input is encoded. Default: 128.
+        `activation` (str): The activation function to be used. Default: "sigmoid". | NOTE: Only `"sigmoid"` and `"relu"` are supported.
         
         Example:
         --------
@@ -95,7 +96,12 @@ class MultiHeadRegressor(nn.Module):
     
         # Takes the final output of concat_fc and maps it to a scalar output
         self.output_fc = nn.Linear(hidden_size, 1)
-        self.relu = nn.ReLU() # Initialize a ReLU activation function
+        if activation == "relu":
+            self.activ = nn.ReLU() # Initialize a ReLU activation function
+        elif activation == "sigmoid":
+            self.activ = nn.Sigmoid()
+        else:
+            raise ValueError("Activation function is invalid, please choose from 'relu' or 'sigmoid'.")
         
     def forward(self, *inputs:torch.Tensor) -> torch.Tensor:
         """ Forward pass of the MultiHeadRegressor.
@@ -105,11 +111,11 @@ class MultiHeadRegressor(nn.Module):
             torch.Tensor: The output of the model, which is a scalar value with shape (batch_size, 1).
         """
         # loop over all the inputs and encode them to a common space | by using list comprehension we use less memory
-        x = torch.cat([self.relu(self.encoders[i](inputs[i])) for i in range(len(inputs))], dim=-1)
+        x = torch.cat([self.activ(self.encoders[i](inputs[i])) for i in range(len(inputs))], dim=-1)
         # Process the concatenated output into a common space
         x = self.concat_fc(x)
         # Apply ReLU activation function
-        x = self.relu(x)
+        x = self.activ(x)
         # Map the output of concat_fc to a scalar output
         x = self.output_fc(x)
         return x
