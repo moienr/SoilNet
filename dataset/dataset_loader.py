@@ -20,7 +20,8 @@ class SNDataset(Dataset):
     self.l8_bands = l8_bands if l8_bands else None
     # Declaring the transform function
     self.transform = transform
-
+    # Reading the csv file in __init__ function to avoid reading it in every __getitem__ call
+    self.df = pd.read_csv(self.csv_dir)
 
   def __len__(self):
     return len(self.l8_names)
@@ -29,8 +30,8 @@ class SNDataset(Dataset):
     l8_img_path = os.path.join(self.l8_dir,l8_img_name)
 
     point_id = l8_img_name.split('_')[0]
-    df = pd.read_csv(self.csv_dir)
-    row = df[df['Point_ID'] == int(point_id)]
+    
+    row = self.df[self.df['Point_ID'] == int(point_id)]
     oc = row['OC'].values[0]
     
 
