@@ -119,6 +119,25 @@ class myToTensor:
     def __call__(self,sample):
         image, oc = sample
         return (self.resize(reshape_tensor(torch.from_numpy(image))).to(dtype=self.dtype), torch.tensor(oc).to(dtype=self.dtype))
+      
+class Augmentations:
+    """Data Augmentation Class
+    To avoid 0 areas when rotating the image, we pad the image with 1/4 of the output size on each side.
+    and after rotating we crop the image to the output size.
+    """
+    def __init__(self, aug_prob = 0.5, out_shape = (64,64)):
+        self.aug_prob = aug_prob
+        self.aug = transforms.Compose([
+                                      transforms.Pad(out_shape[0]//4, out_shape[1]//4, padding_mode='reflect'),
+                                      transforms.RandomHorizontalFlip(p=0.5),
+                                      transforms.RandomVerticalFlip(p=0.5),
+                                      transforms.RandomRotation((0,90)),
+                                      transforms.CenterCrop(size=out_shape)
+                                       ])
+    def __call__(self,sample):
+      image, oc = sample
+      return(self.aug(image), oc)
+        
 
 
 if __name__ == "__main__":
@@ -129,26 +148,40 @@ if __name__ == "__main__":
     print('image shape: ',x[0].shape , x[0].dtype)
     
     
-    # Testing the transforms
-    print('Testing MyTransfroms...')
-    mynorm = myNormalize()
-    rand_img = np.random.rand(100,100,12)
-    rand_img[7:12] = rand_img[7:12] * 2 - 1
-    rand_oc = np.random.rand(1) * 1000
+    # # Testing the transforms
+    # print('Testing MyTransfroms...')
+    # mynorm = myNormalize()
+    # rand_img = np.random.rand(100,100,12)
+    # rand_img[7:12] = rand_img[7:12] * 2 - 1
+    # rand_oc = np.random.rand(1) * 1000
     
-    my_to_tensor = myToTensor()
+    # my_to_tensor = myToTensor()
     
-    transform = transforms.Compose([mynorm, my_to_tensor])
+    # transform = transforms.Compose([mynorm, my_to_tensor])
     
-    y = transform((rand_img, rand_oc))
-    print('OC: ', y[1], type(y[1]))
-    print('image shape: ',y[0].shape , y[0].dtype , torch.min(y[0]), torch.max(y[0]) , sep=" | ")
+    # y = transform((rand_img, rand_oc))
+    # print('OC: ', y[1], type(y[1]))
+    # print('image shape: ',y[0].shape , y[0].dtype , torch.min(y[0]), torch.max(y[0]) , sep=" | ")
     
     
     print("Testing the dataset with transforms...")
+    mynorm = myNormalize()
+    my_to_tensor = myToTensor()
+    transform = transforms.Compose([mynorm, my_to_tensor])
     ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv',transform=transform)
-    x = ds[0]
+    rand = np.random.randint(0,len(ds))
+    x = ds[rand]
     print('OC: ', x[1], type(x[1]))
     print('image shape: ',x[0].shape , x[0].dtype)
+    print('image min: ', torch.min(x[0]), 'image max: ', torch.max(x[0]))
     
+    print("Testing the dataset with transforms and Augmentations...")
+    augment = Augmentations()
+    aug_img = augment(x)
+    print("Augmented image shape: ", aug_img[0].shape)
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(1,2)
+    ax[0].imshow(x[0].permute(1,2,0).numpy()[:,:,[3,2,1]]*2)
+    ax[1].imshow(aug_img[0].permute(1,2,0).numpy()[:,:,[3,2,1]]*2)
+    plt.show()
     
