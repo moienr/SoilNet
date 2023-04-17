@@ -273,7 +273,7 @@ class ResNet101GLAM(nn.Module):
         Args:
             x (torch.Tensor): a batch of images with shape (batch_size, in_channels, image_size, image_size)
         Returns:
-            _type_: a batch of features with shape (batch_size, out_nodes)
+            torch.Tensor s: a batch of features with shape (batch_size, out_nodes)
         """
         x = self.resnet(x)
         x = self.relu(x)
