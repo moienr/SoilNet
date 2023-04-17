@@ -1,3 +1,9 @@
+"""Global Local Attention Moduel
+From the paper: All the attention you need: Global-local, spatial-channel attention for image retrieval
+link: https://arxiv.org/abs/2107.08000
+
+"""
+
 import torch
 from torch import nn
 from .local_channel_attention import LocalChannelAttention
