@@ -246,7 +246,8 @@ class ResNet101(nn.Module):
         return x
     
 class ResNet101GLAM(nn.Module):
-    """Resnet but with added GLAM layer
+    """ ### Resnet but with added GLAM layer
+    
     GLAM in the original paper is applied at the end of the resnet 101, at a layer where the feature map is 8x8.
     But in this case,Since our input is a 64x64 image instead of 256x256, we want to apply it at the end of the first resnet block,
     so that the feature map is 8x8. This is done by adding a GLAM layer after the first resnet block.
