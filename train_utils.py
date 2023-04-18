@@ -91,7 +91,7 @@ def train(model: torch.nn.Module,
     if lr_scheduler == "plateau":
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5, verbose=True)
     elif lr_scheduler == "step":
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1, verbose=True)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.2, verbose=True)
     else:
         pass
     # 2. Create empty results dictionary
