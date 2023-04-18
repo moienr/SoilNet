@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128, ResNet101
+from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128, ResNet101, ResNet101GLAM
 from submodules.regressor import Regressor, MultiHeadRegressor
 from submodules import rnn
 
@@ -104,6 +104,9 @@ class ResNet(nn.Module):
         if resnet_architecture == "101":
             self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
+        if resnet_architecture == "101+GLAM":
+            self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
         
     def forward(self, raster_stack):
         """
@@ -149,7 +152,7 @@ if __name__ == "__main__":
     
     print("Testing Resnet...")
     x = torch.randn((32,12,64,64))
-    model = ResNet(cnn_in_channels=12)
+    model = ResNet(cnn_in_channels=12, resnet_architecture="101+GLAM")
     y = model(x)
     print(y.detach().shape)
     
