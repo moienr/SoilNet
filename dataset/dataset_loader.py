@@ -139,6 +139,35 @@ class Augmentations:
       image, oc = sample
       return(self.aug(image), oc)
         
+        
+        
+class RFTransform:
+  """
+  This class is used to transform the image and the target value to be used in the Random Forest model.
+  """
+  def __init__(self):
+    """
+    This class is used to transform the image and the target value to be used in the Random Forest model.
+    """
+    pass
+
+  def __call__(self,sample):
+    """
+    Input:
+    - sample (tuple): A tuple containing the image and the target value.
+    Returns:
+    - A tuple containing the reshaped image and the target value, in the form of a numpy array.
+    """
+    img, oc = sample
+    
+    # reshaping the image into (bands, height, width)
+    img = reshape_array(img)
+    
+    # IMPORTANT : Replacing NaN values with 0, Just a NAN pixel in the input image will cause the whole image to be NaN in the output
+    img[np.isnan(img)] = 0
+
+    return img, oc  
+        
 
 
 if __name__ == "__main__":
