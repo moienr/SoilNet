@@ -65,7 +65,7 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
 
 
 if __name__ == "__main__":
-    train_losses = np.random.random((10, 100))
-    test_losses = np.random.random((10, 100)) * 3
+    train_losses = np.random.random((10, 100)) * np.geomspace(100, 1, num=100, endpoint=True)  /100 
+    test_losses = np.random.random((10, 100)) * np.geomspace(100, 1, num=100, endpoint=True)  /100 + np.linspace(.1, 0, num=100, endpoint=True) + 0.05
 
-    plot_train_test_losses(train_losses, test_losses,y_lim=[0,3])
+    plot_train_test_losses(train_losses, test_losses,y_lim=[0,1])
