@@ -10,12 +10,12 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
 
     Parameters:
     ---
-    train_losses (numpy array): Array of train losses for each epoch
-    test_losses (numpy array): Array of test losses for each epoch
+    train_losses (numpy array): Array of train losses for each epoch. The shape of the array should be (num_runs, num_epochs)
+    test_losses (numpy array): Array of test losses for each epoch. The shape of the array should be (num_runs, num_epochs)
     title (str): Title of the plot (default is "Train Test Loss")
     x_label (str): Label for the x-axis (default is "Epochs")
     y_label (str): Label for the y-axis (default is "RMSE")
-    min_max_bounds (bool): If True, the plot shows minimum and maximum values of losses (default is False)
+    min_max_bounds (bool): If True, the plot shows minimum and maximum values of losses, if False, the plot shows mean and standard deviation of losses (default is False)
     y_lim (tuple): Limits for the y-axis (default is None)
     save_path (str): If provided, saves the plot at the given path (default is None)
 
@@ -45,7 +45,6 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
         lower_test_losses = mean_test_losses - std_test_losses
         upper_test_losses = mean_test_losses + std_test_losses
 
-
     
     plt.plot(mean_train_losses, color='#33a9a5', linewidth=2, label='Train loss')
     plt.fill_between(range(train_losses.shape[1]), lower_train_losses, upper_train_losses, alpha=0.2, color='#33a9a5', edgecolor='none')
@@ -61,8 +60,6 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
         plt.ylim(y_lim)
     if save_path is not None:
         plt.savefig(save_path, dpi=300)
-    
-    
     
     plt.show()
 
