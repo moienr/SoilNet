@@ -2,9 +2,31 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_train_test_losses(train_losses, test_losses, title="Train Test Loss",
+def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="Train Test Loss",
                            x_label="Epochs", y_label="RMSE", min_max_bounds= False,
-                           y_lim=None, save_path=None):
+                           y_lim=None, save_path=None)->None:
+    """
+    This function takes in train and test losses as inputs and plots them using matplotlib.
+
+    Parameters:
+    ---
+    train_losses (numpy array): Array of train losses for each epoch
+    test_losses (numpy array): Array of test losses for each epoch
+    title (str): Title of the plot (default is "Train Test Loss")
+    x_label (str): Label for the x-axis (default is "Epochs")
+    y_label (str): Label for the y-axis (default is "RMSE")
+    min_max_bounds (bool): If True, the plot shows minimum and maximum values of losses (default is False)
+    y_lim (tuple): Limits for the y-axis (default is None)
+    save_path (str): If provided, saves the plot at the given path (default is None)
+
+    Returns:
+    ---
+    None
+
+    Example Usage:
+    ---
+    plot_train_test_losses(train_losses, test_losses, title="Train Test Losses", x_label="Epochs", y_label="RMSE")
+    """
     plt.rcParams["font.family"] = "Times New Roman"
     plt.rcParams["font.size"] = 14
     plt.rcParams["axes.labelsize"] = 12
