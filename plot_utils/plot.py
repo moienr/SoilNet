@@ -59,8 +59,8 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     if y_lim is not None:
         plt.ylim(y_lim)
     if save_path is not None:
-        plt.savefig(save_path, dpi=300)
-    
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    plt.tight_layout()
     plt.show()
 
 
