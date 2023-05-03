@@ -58,7 +58,8 @@ class R2Loss(nn.Module):
         Returns:
             torch.Tensor: Scalar tensor representing the R2 loss
         """
-        return 1 - (self.mse(yhat,y)/self.mse(y,y.mean()))
+        ones = torch.ones_like(y)
+        return 1 - (self.mse(yhat,y)/self.mse(y,ones*y.mean()))
 
 def train_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, optimizer:torch.optim.Optimizer):
     model.train()
@@ -107,7 +108,9 @@ def test_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, verbos
             #     print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
     test_loss /= len(data_loader)
-    if verbose:print(f"Test Loss: {test_loss:>8f}%")
+    if verbose:
+        print(f"Test Loss: {test_loss:>8f}%")
+        print(y_pred.shape, y.shape)
     return test_loss
 
 
@@ -176,8 +179,8 @@ def train(model: torch.nn.Module,
             scheduler.step(train_loss)
         else:
             pass
-    results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss())) 
-    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Loss())) 
+    results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False)) 
+    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Loss(), verbose=False)) 
     # 6. Return the filled results at the end of the epochs
     return results
 
