@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="Train Test Loss",
                            x_label="Epochs", y_label="RMSE",
-                           min_max_bounds= False,
+                           min_max_bounds= True,
                            tight_x_lim = True, y_lim=None,
                            save_path=None)->None:
     """
@@ -48,12 +48,13 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
         lower_test_losses = mean_test_losses - std_test_losses
         upper_test_losses = mean_test_losses + std_test_losses
 
+    x_range = range(1, len(mean_train_losses) + 1)
     
-    plt.plot(mean_train_losses, color='#33a9a5', linewidth=2, label='Train loss')
-    plt.fill_between(range(train_losses.shape[1]), lower_train_losses, upper_train_losses, alpha=0.2, color='#33a9a5', edgecolor='none')
+    plt.plot(x_range ,mean_train_losses, color='#33a9a5', linewidth=2, label='Train loss')
+    plt.fill_between(x_range, lower_train_losses, upper_train_losses, alpha=0.2, color='#33a9a5', edgecolor='none')
 
-    plt.plot(mean_test_losses, color='#f27085', linewidth=2, label='Test loss')
-    plt.fill_between(range(train_losses.shape[1]), lower_test_losses, upper_test_losses, alpha=0.2, color='#f27085', edgecolor='none')
+    plt.plot(x_range ,mean_test_losses, color='#f27085', linewidth=2, label='Test loss')
+    plt.fill_between(x_range, lower_test_losses, upper_test_losses, alpha=0.2, color='#f27085', edgecolor='none')
 
     plt.legend()
     plt.title(title)
@@ -62,7 +63,7 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     if y_lim is not None:
         plt.ylim(y_lim)
     if tight_x_lim:
-        plt.xlim(0, train_losses.shape[1])
+        plt.xlim(1, train_losses.shape[1])
     if save_path is not None:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.tight_layout()
