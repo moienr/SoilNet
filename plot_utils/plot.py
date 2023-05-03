@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="Train Test Loss",
                            x_label="Epochs", y_label="RMSE",
                            min_max_bounds= False,
-                           tigh_x_lim = True, y_lim=None,
+                           tight_x_lim = True, y_lim=None,
                            save_path=None)->None:
     """
     This function takes in train and test losses as inputs and plots them using matplotlib.
@@ -61,7 +61,7 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     plt.ylabel(y_label)
     if y_lim is not None:
         plt.ylim(y_lim)
-    if tigh_x_lim:
+    if tight_x_lim:
         plt.xlim(0, train_losses.shape[1])
     if save_path is not None:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
