@@ -147,7 +147,7 @@ def train(model: torch.nn.Module,
     }
     
     # 3. Loop through training and testing steps for a number of epochs
-    for epoch in range(1, epochs):
+    for epoch in range(1, epochs+1):
         print(tc.OKGREEN,f"Epoch {epoch}\n-------------------------------",tc.ENDC)
         train_loss = train_step(model=model,
                                            data_loader=train_dataloader,
@@ -176,8 +176,8 @@ def train(model: torch.nn.Module,
             scheduler.step(train_loss)
         else:
             pass
-    results["MAE"] = test_loss(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss())
-    results["R2"] = test_loss(model=model, data_loader=test_dataloader, loss_fn=R2Loss())
+    results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss())) 
+    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Loss())) 
     # 6. Return the filled results at the end of the epochs
     return results
 
