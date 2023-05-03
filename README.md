@@ -10,9 +10,9 @@
 
 
 ### MODEL
-- Add Spatial Attention Module
+- ~~Add Spatial Attention Module~~
 - ~~FCNN + Regressor~~
-- FCNN + SA + Regressor
+- ~~FCNN + SA + Regressor~~
 
 ### DATASET
 - ~~Add TerraClimate Dataset~~

@@ -5,6 +5,7 @@ from skimage import io
 import os
 from torchvision import datasets, transforms
 import pandas as pd
+import torch.nn.functional as F
 
 from utils.utils import reshape_tensor, reshape_array, get_df_max_min, normalize
 
@@ -139,6 +140,88 @@ class Augmentations:
       image, oc = sample
       return(self.aug(image), oc)
         
+        
+        
+class RFTransform:
+  """
+  This class is used to transform the image and the target value to be used in the Random Forest model.
+  """
+  def __init__(self):
+    """
+    This class is used to transform the image and the target value to be used in the Random Forest model.
+    """
+    pass
+
+  def __call__(self,sample):
+    """
+    Input:
+    - sample (tuple): A tuple containing the image and the target value.
+    Returns:
+    - A tuple containing the reshaped image and the target value, in the form of a numpy array.
+    """
+    img, oc = sample
+    
+    # reshaping the image into (bands, height, width)
+    img = reshape_array(img)
+    
+    # IMPORTANT : Replacing NaN values with 0, Just a NAN pixel in the input image will cause the whole image to be NaN in the output
+    img[np.isnan(img)] = 0
+
+    return img, oc  
+        
+class TensorCenterPixels:
+    """Takes in a pytorch tensor and returns the center pixels of the image.
+
+    """
+    def __init__(self, pixel_radius = 1, interpolate_center_pixel = False):
+        """
+        Args:
+            pixel_radius (int): The radius of the region around the center of the image to return. Default is 1. (1 returns a 2x2 region, 2 returns a 4x4 region, etc.)
+            interpolate_center_pixel (bool): Whether or not to use bilinear interpolation to estimate the center pixel value, If Falce,
+            it will return a (c, 2*pixel_radius, 2*pixel_radius) tensor. If True, it will return a (c, 1, 1) tensor. (Default is False
+                                              Default is False.
+        Returns:
+            A tuple containing the center pixels of the image and the target value.
+        """
+        self.pixel_radius = pixel_radius
+        self.interpolate_center_pixel = interpolate_center_pixel
+        
+    def bilinear_interpolation(self, tensor):
+        """A method that resamples a tensor using bilinear interpolation to estimate the center pixel value.
+           Input tensors are even, so they don't have a center, we upsample them to an odd nmber (1 pixel larger)
+           Then we take the center Pixel.
+
+        Args:
+            tensor (torch.Tensor): The tensor to resample.
+
+        Returns:
+            A tensor of shape (C,1,1), where C is the number of channels in the input tensor, containing the estimated
+            values of the center pixel for each channel.
+        """
+        # Resample tensor to (c,3,3) using bilinear interpolation
+        upsample = torch.nn.Upsample(size=(self.pixel_radius*2+1,self.pixel_radius*2+1), mode='bilinear', align_corners=True)
+        resampled_tensor = upsample(tensor.unsqueeze(0))
+        resampled_tensor = resampled_tensor.squeeze(0)
+        return resampled_tensor[:,self.pixel_radius:self.pixel_radius+1,self.pixel_radius:self.pixel_radius+1]
+    
+    def __call__(self,sample):
+        """A method that returns the center pixels of an image.
+
+        Args:
+            sample (tuple): A tuple of (image, oc), where image is a pytorch tensor of shape (C, H, W) and oc is an 
+                            object class label.
+
+        Returns:
+            If self.interpolate_center_pixel is False, returns a tensor of shape (C, 2*pixel_radius, 2*pixel_radius),
+            containing the center pixels of the input image. If self.interpolate_center_pixel is True, returns a tensor
+            of shape (C,1,1), containing the estimated values of the center pixel for each channel, obtained by resampling
+            the input image using bilinear interpolation.
+        """
+        image, oc = sample
+        image = transforms.functional.center_crop(image, self.pixel_radius*2)
+        if self.interpolate_center_pixel:
+          image = self.bilinear_interpolation(image)
+        return image, oc
 
 
 if __name__ == "__main__":
@@ -185,4 +268,14 @@ if __name__ == "__main__":
     ax[0].imshow(x[0].permute(1,2,0).numpy()[:,:,[3,2,1]]*2)
     ax[1].imshow(aug_img[0].permute(1,2,0).numpy()[:,:,[3,2,1]]*2)
     plt.show()
+    
+    
+    print("Testing Torch Center Pxiel...")
+    cp = TensorCenterPixels(1,interpolate_center_pixel=True)
+    rand_tensor = torch.tensor([[[1,2],[3,4]],[[1,2],[3,4]],[[1,2],[3,4]]]).to(torch.float32)
+    # rand_tensor = torch.rand(8,100,100)
+    rand_oc = np.random.rand(1) * 1000
+    croped = cp((rand_tensor,rand_oc))
+    print("shape after croping: ", croped[0].shape)
+    print("Center Pixle of the First band: ",croped[0][0])
     
