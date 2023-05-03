@@ -14,6 +14,51 @@ class RMSELoss(nn.Module):
         
     def forward(self,yhat,y):
         return torch.sqrt(self.mse(yhat,y))
+    
+class R2Loss(nn.Module):
+    """
+    Calculates the R2 loss for regression problems.
+
+    The R2 loss measures the proportion of variance in the dependent variable that can be explained by the independent
+    variable. It is also known as the coefficient of determination.
+
+    Args:
+        None
+
+    Shape:
+        - Input: (batch_size, *)
+        - Target: (batch_size, *)
+        - Output: scalar value
+
+    Attributes:
+        mse (nn.MSELoss): Mean squared error loss
+
+    Examples::
+        >>> loss = R2Loss()
+        >>> yhat = torch.tensor([1, 2, 3, 4])
+        >>> y = torch.tensor([2, 4, 6, 8])
+        >>> r2 = loss(yhat, y)
+    """
+
+    def __init__(self):
+        """
+        Initializes the R2Loss module.
+        """
+        super().__init__()
+        self.mse = nn.MSELoss()
+        
+    def forward(self,yhat,y):
+        """
+        Calculates the R2 loss for the given predictions and targets.
+
+        Args:
+            yhat (torch.Tensor): Predictions tensor of shape (batch_size, *)
+            y (torch.Tensor): Targets tensor of shape (batch_size, *)
+
+        Returns:
+            torch.Tensor: Scalar tensor representing the R2 loss
+        """
+        return 1 - (self.mse(yhat,y)/self.mse(y,y.mean()))
 
 def train_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, optimizer:torch.optim.Optimizer):
     model.train()
@@ -96,7 +141,9 @@ def train(model: torch.nn.Module,
         pass
     # 2. Create empty results dictionary
     results = {"train_loss": [],
-        "test_loss": [],
+               "test_loss": [],
+               "MAE": [],
+               "R2": []
     }
     
     # 3. Loop through training and testing steps for a number of epochs
@@ -129,6 +176,8 @@ def train(model: torch.nn.Module,
             scheduler.step(train_loss)
         else:
             pass
+    results["MAE"] = test_loss(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss())
+    results["R2"] = test_loss(model=model, data_loader=test_dataloader, loss_fn=R2Loss())
     # 6. Return the filled results at the end of the epochs
     return results
 
