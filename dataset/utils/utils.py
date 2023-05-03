@@ -116,6 +116,18 @@ class TextColors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    class BOLD_BAKGROUNDs:
+        BLACK = '\033[1;40m'
+        RED = '\033[1;41m'
+        GREEN = '\033[1;42m'
+        YELLOW = '\033[1;43m'
+        BLUE = '\033[1;44m'
+        PURPLE = '\033[1;45m'
+        CYAN = '\033[1;46m'
+        WHITE = '\033[1;47m'
+        ORANGE = '\033[48;2;255;165;0m\033[1m'
+        S1 ='\033[48;2;100;50;50m'
+        S2 = '\033[48;2;50;50;100m'
 
 import os
 def create_folder_if_not_exists(folder_name):
