@@ -69,7 +69,13 @@ def train_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, optim
     loop = tqdm(data_loader, leave=True)
     for batch, (X, y) in enumerate(loop):
         # Send data to target device
-        X, y = X.to(device), y.to(device)
+        if isinstance(X, tuple) or isinstance(X, list): # if its a tuple it has the climate data in it
+            X = [tensor.to(device) for tensor in list(X)]
+            y = y.to(device)
+        elif isinstance(X, torch.Tensor): # if its a tensor then its only the Image data
+            X, y = X.to(device), y.to(device)
+        else:
+            raise ValueError(f"Input of the netowrk must be either a Tensor or a Tuple of Tensors but it is: {type(X)}")
         # 1. Forward pass
         y_pred = model(X)
 
@@ -99,7 +105,14 @@ def test_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, verbos
     test_loss = 0
     with torch.inference_mode():
         for batch, (X, y) in enumerate(data_loader):
-            X, y = X.to(device), y.to(device)
+            # Send data to target device
+            if isinstance(X, tuple) or isinstance(X, list): # if its a tuple it has the climate data in it
+                X = [tensor.to(device) for tensor in list(X)]
+                y = y.to(device)
+            elif isinstance(X, torch.Tensor): # if its a tensor then its only the Image data
+                X, y = X.to(device), y.to(device)
+            else:
+                raise ValueError(f"Input of the netowrk must be either a Tensor or a Tuple of Tensors but it is: {type(X)}")
             y_pred = model(X)
             loss = loss_fn(y_pred, y.unsqueeze(1))
             test_loss += loss.item()
