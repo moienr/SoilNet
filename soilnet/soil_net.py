@@ -3,7 +3,7 @@ import torch.nn as nn
 from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128, ResNet101, ResNet101GLAM
 from submodules.regressor import Regressor, MultiHeadRegressor
 from submodules import rnn
-
+from typing import Tuple
 
 class SoilNet(nn.Module):
     def __init__(self, input_size=1024, aux_size=12, hidden_size=128):
@@ -142,10 +142,11 @@ class ResNetLSTM(nn.Module):
         
         self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size)
         
-    def forward(self, raster_stack, ts_features):
+    def forward(self, input_raster_ts: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         """
         Inputs
         ------
+        input_raster_ts : A tupple containing the following two tensors:
             * raster_stack (torch.Tensor): A 4D tensor of shape `(batch_size, channels, height, width)` representing a stack of raster images.
             * ts_features (torch.Tensor): A 3D tensor of shape `(batch_size, seq_length, , n_features)` representing a sequence of time-series features. | `seq_length` is the number of time steps in the sequence. e.g. months in our climate data
             
@@ -153,6 +154,7 @@ class ResNetLSTM(nn.Module):
         -------
             - output (torch.Tensor): A tensor of shape `(batch_size, 1)` representing the predicted output of regression.
         """
+        raster_stack, ts_features = input_raster_ts
         flat_raster = self.cnn(raster_stack)
         lstm_output = self.lstm(ts_features)
         output = self.reg(flat_raster, lstm_output)
