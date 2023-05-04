@@ -104,9 +104,11 @@ class ResNet(nn.Module):
         if resnet_architecture == "101":
             self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
-        if resnet_architecture == "101+GLAM":
+        elif resnet_architecture == "101+GLAM":
             self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
+        else:
+            raise ValueError("Invalid resnet architecture. Please choose from '101' or '101+GLAM'.")
         
     def forward(self, raster_stack):
         """
@@ -123,7 +125,40 @@ class ResNet(nn.Module):
         output = self.reg(flat_raster)
         return output
         
-    
+class ResNetLSTM(nn.Module):
+    def __init__(self, resnet_architecture = "101" ,
+                 cnn_in_channels = 14 ,regresor_input_from_cnn = 1024,
+                 lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128):
+        
+        super().__init__()
+        if resnet_architecture == "101":
+            self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)      
+        elif resnet_architecture == "101+GLAM":
+            self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+        else:
+            raise ValueError("Invalid resnet architecture. Please choose from '101' or '101+GLAM'.")
+        
+        self.lstm = rnn.LSTM(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
+        
+        self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size)
+        
+    def forward(self, raster_stack, ts_features):
+        """
+        Inputs
+        ------
+            * raster_stack (torch.Tensor): A 4D tensor of shape `(batch_size, channels, height, width)` representing a stack of raster images.
+            * ts_features (torch.Tensor): A 3D tensor of shape `(batch_size, seq_length, , n_features)` representing a sequence of time-series features. | `seq_length` is the number of time steps in the sequence. e.g. months in our climate data
+            
+        Outputs
+        -------
+            - output (torch.Tensor): A tensor of shape `(batch_size, 1)` representing the predicted output of regression.
+        """
+        flat_raster = self.cnn(raster_stack)
+        lstm_output = self.lstm(ts_features)
+        output = self.reg(flat_raster, lstm_output)
+        return output
+            
+ 
     
     
     
@@ -156,4 +191,10 @@ if __name__ == "__main__":
     y = model(x)
     print(y.detach().shape)
     
-    
+    print('Testing ResNetLSTM...')
+    x_cnn = torch.randn((32,12,64,64)).to(device)
+    x_lstm = torch.randn((32, 60, 10)).to(device)
+    model = ResNetLSTM(resnet_architecture="101+GLAM", cnn_in_channels= 12, regresor_input_from_cnn=1024,
+                       lstm_n_features= 10, lstm_n_layers=2, lstm_out=128, hidden_size=128).to(device)
+    y= model(x_cnn, x_lstm)
+    print(y.detach().shape)
