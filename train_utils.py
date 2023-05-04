@@ -6,6 +6,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 from dataset.utils.utils import TextColors as tc
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+import os
 
 class RMSELoss(nn.Module):
     def __init__(self):
@@ -114,6 +115,15 @@ def test_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, verbos
     return test_loss
 
 
+def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
+    print("=> Saving checkpoint")
+    checkpoint = {
+        "state_dict": model.state_dict(),
+        "optimizer": optimizer.state_dict(),
+    }
+    torch.save(checkpoint, filename)
+
+
 # 1. Take in various parameters required for training and test steps
 def train(model: torch.nn.Module, 
           train_dataloader: torch.utils.data.DataLoader, 
@@ -121,17 +131,20 @@ def train(model: torch.nn.Module,
           optimizer: torch.optim.Optimizer,
           loss_fn: torch.nn.Module = RMSELoss(),
           epochs: int = 5,
-          lr_scheduler: bool = None):
+          lr_scheduler: bool = None,
+          save_model_path = None
+          ):
     """_summary_
 
     Args:
-        model (torch.nn.Module): _description_
-        train_dataloader (torch.utils.data.DataLoader): _description_
-        test_dataloader (torch.utils.data.DataLoader): _description_
-        optimizer (torch.optim.Optimizer): _description_
-        loss_fn (torch.nn.Module, optional): _description_. Defaults to RMSELoss().
-        epochs (int, optional): _description_. Defaults to 5.
-        lr_scheduler (bool, optional): _description_. Defaults to None. / plateau or step
+        model (torch.nn.Module): Pytorch model
+        train_dataloader (torch.utils.data.DataLoader): train dataloader
+        test_dataloader (torch.utils.data.DataLoader): test dataloader
+        optimizer (torch.optim.Optimizer): optimizer
+        loss_fn (torch.nn.Module, optional): Loss funciton. Defaults to RMSELoss().
+        epochs (int, optional): Number of Epochs. Defaults to 5.
+        lr_scheduler (bool, optional): Use LR scheduler. Defaults to None, Options are "plateau" or "step" . Defaults to None. / plateau or step
+        save_model_path (str, optional): If given, saves the model with the given name and path. Defaults to None | Example: "my_checkpoint.pth.tar".
 
     Returns:
         _type_: _description_
@@ -181,6 +194,9 @@ def train(model: torch.nn.Module,
             pass
     results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False)) 
     results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Loss(), verbose=False)) 
+    # Save the model
+    if save_model_path:
+        save_checkpoint(model, optimizer, filename=save_model_path)
     # 6. Return the filled results at the end of the epochs
     return results
 
