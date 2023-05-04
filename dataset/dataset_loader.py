@@ -46,7 +46,85 @@ class SNDataset(Dataset):
         
     return l8_img,oc
   
+class SNDatasetClimate(Dataset):
+  def __init__(self, l8_dir, csv_dir , climate_csv_folder,
+               l8_bands: list = None ,transform = None,
+               dates = ['20100101', '20100201', '20100301', '20100401', '20100501', '20100601',
+                        '20100701', '20100801', '20100901', '20101001', '20101101', '20101201',
+                        '20110101', '20110201', '20110301', '20110401', '20110501', '20110601',
+                        '20110701', '20110801', '20110901', '20111001', '20111101', '20111201',
+                        '20120101', '20120201', '20120301', '20120401', '20120501', '20120601',
+                        '20120701', '20120801', '20120901', '20121001', '20121101', '20121201',
+                        '20130101', '20130201', '20130301', '20130401', '20130501', '20130601',
+                        '20130701', '20130801', '20130901', '20131001', '20131101', '20131201',
+                        '20140101', '20140201', '20140301', '20140401', '20140501', '20140601',
+                        '20140701', '20140801', '20140901', '20141001', '20141101', '20141201', '20150101'],
+               climate_dtype = torch.float32
+               ):
+    """_summary_
+
+    Args:
+        l8_dir (_type_): _description_
+        csv_dir (_type_): _description_
+        climate_csv_folder (_type_): _description_
+        l8_bands (list, optional): _description_. Defaults to None.
+        transform (_type_, optional): _description_. Defaults to None.
+        dates (list, optional): _description_. Defaults to ['20100101', '20100201', '20100301', '20100401', '20100501', '20100601', '20100701', '20100801', '20100901', '20101001', '20101101', '20101201', '20110101', '20110201', '20110301', '20110401', '20110501', '20110601', '20110701', '20110801', '20110901', '20111001', '20111101', '20111201', '20120101', '20120201', '20120301', '20120401', '20120501', '20120601', '20120701', '20120801', '20120901', '20121001', '20121101', '20121201', '20130101', '20130201', '20130301', '20130401', '20130501', '20130601', '20130701', '20130801', '20130901', '20131001', '20131101', '20131201', '20140101', '20140201', '20140301', '20140401', '20140501', '20140601', '20140701', '20140801', '20140901', '20141001', '20141101', '20141201', '20150101'].
+        climate_dtype (_type_, optional): Datatype when converting to Tensor | only works if Transfrom is goven. Defaults to torch.float32.
+    """
+    
+    # Declaring them becuase we nee them in __getitem__ function
+    self.l8_dir = l8_dir
+    self.csv_dir = csv_dir
+    # List of the names in each path
+    self.l8_names = [f for f in os.listdir(l8_dir) if f.endswith('.tif')] # reading only 
+    self.l8_names.sort()
+    # Declaring the l8 bands we want to use, if None all the bands will be used
+    self.l8_bands = l8_bands if l8_bands else None
+    # Declaring the transform function
+    self.transform = transform
+    # Reading the csv file in __init__ function to avoid reading it in every __getitem__ call
+    self.df = pd.read_csv(self.csv_dir)
+    
+    # Reading Climate csv files
+    # List all files in the directory and filter for .csv files
+    csv_files = [f for f in os.listdir(climate_csv_folder) if os.path.isfile(os.path.join(climate_csv_folder, f)) and f.endswith('.csv')]
+    self.clim_dfs =  [pd.read_csv(os.path.join(climate_csv_folder, f)) for f in csv_files]
+    norm_clim = NormalizeClimDF(dates=dates)
+    self.clim_dfs = [norm_clim(clim_df) for clim_df in self.clim_dfs]
+    self.dates = dates
+    self.clim_dtype = climate_dtype
+    
+  def __len__(self):
+    return len(self.l8_names)
   
+  def __getitem__(self, index):
+    l8_img_name = self.l8_names[index] 
+    l8_img_path = os.path.join(self.l8_dir,l8_img_name)
+
+    point_id = l8_img_name.split('_')[0]
+    
+    row = self.df[self.df['Point_ID'] == int(point_id)]
+    oc = row['OC'].values[0]
+    
+    self.clim_dfs_row = [df[df['Point_ID'] == int(point_id)] for df in self.clim_dfs]
+    self.clim_dfs_row = [df[self.dates] for df in self.clim_dfs_row]
+    clim_arr = np.stack([df.values.squeeze() for df in self.clim_dfs_row], axis=1)
+
+    l8_img = io.imread(l8_img_path)
+    if self.l8_bands: l8_img = l8_img[self.l8_bands,:,:]
+
+
+
+    if self.transform:
+        l8_img,oc  = self.transform((l8_img,oc))
+        clim_arr = torch.tensor(clim_arr).to(dtype=self.clim_dtype)
+        
+    return (l8_img,clim_arr),oc
+  
+#############################################################################################################    
+############################################# Transformations ###############################################    
+#############################################################################################################   
 
 class myNormalize:
   """Normalize the image and the target value"""
@@ -223,6 +301,25 @@ class TensorCenterPixels:
           image = self.bilinear_interpolation(image)
         return image, oc
 
+class NormalizeClimDF:
+    def __init__(self,
+                 dates = ['20100101', '20100201', '20100301', '20100401', '20100501', '20100601', '20100701', '20100801', '20100901', '20101001', '20101101', '20101201', '20110101', '20110201', '20110301', '20110401', '20110501', '20110601', '20110701', '20110801', '20110901', '20111001', '20111101', '20111201', '20120101', '20120201', '20120301', '20120401', '20120501', '20120601', '20120701', '20120801', '20120901', '20121001', '20121101', '20121201', '20130101', '20130201', '20130301', '20130401', '20130501', '20130601', '20130701', '20130801', '20130901', '20131001', '20131101', '20131201', '20140101', '20140201', '20140301', '20140401', '20140501', '20140601', '20140701', '20140801', '20140901', '20141001', '20141101', '20141201', '20150101'],
+                 ):
+        self.dates = dates
+    def __call__(self, df):
+      if df.isna().values.any() or df.isnull().values.any():
+          raise ValueError('NaN or Null values in dataframe')
+      # Reading Time Series Data  
+      df_vals = df[self.dates]
+      X = df_vals.values# Converting to numpy array
+      X = (X - np.min(X)) / (np.max(X) - np.min(X)) # Normalizing
+      df_vals = pd.DataFrame(X) # Converting back to dataframe
+      df[self.dates] = df_vals # Replacing the normalized values in the original dataframe
+      return df
+      
+#############################################################################################################    
+#############################################      Tests      ###############################################    
+#############################################################################################################   
 
 if __name__ == "__main__":
     ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv')
@@ -279,3 +376,16 @@ if __name__ == "__main__":
     print("shape after croping: ", croped[0].shape)
     print("Center Pixle of the First band: ",croped[0][0])
     
+    
+    
+    print("Testing SNDatasetClimate...")
+    ds = SNDatasetClimate('D:\\python\\SoilNet\\dataset\\l8_images\\train\\',
+                          'D:\\python\\SoilNet\\dataset\\LUCAS_2015_all.csv',
+                          "D:\\python\\SoilNet\\dataset\\Climate\\All\\filled", transform=transform)
+    rand = np.random.randint(0,len(ds))
+    x = ds[rand]
+    print('OC: ', x[1], type(x[1]))
+    print('image shape: ',x[0][0].shape , x[0][0].dtype)
+    print('image min: ', torch.min(x[0][0]), 'image max: ', torch.max(x[0][0]))
+    print("climate:", x[0][1].shape)
+    x = ds[2] # checking if getting another Item creaste an error or not | last time getting the first item was changing global values which leaded to errors
