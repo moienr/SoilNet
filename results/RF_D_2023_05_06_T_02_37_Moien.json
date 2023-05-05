@@ -1,0 +1,17 @@
+{
+    "RMSE": 4.04168434701644,
+    "USE_CLIMATE": false,
+    "USE_SRTM": true,
+    "NUM_ITTERS": 1,
+    "CV": 2,
+    "SEED": 42,
+    "param_dist": "{'n_estimators': <scipy.stats._distn_infrastructure.rv_discrete_frozen object at 0x0000029ADB094040>, 'max_depth': [10, 20, 30]}",
+    "BEST_PARAMS": {
+        "max_depth": 30,
+        "n_estimators": 93
+    },
+    "TIME": {
+        "start": "2023-05-06 02:37:07",
+        "finish": "2023-05-06 02:37:16"
+    }
+}
