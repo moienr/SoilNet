@@ -16,8 +16,15 @@
 
 ### DATASET
 - ~~Add TerraClimate Dataset~~
-- Update the ClimateInformation.js (in processing)
+- ~~Update the ClimateInformation.js (in processing)~~
 - ~~Write SRTM + Slope dataset donwlaoder~~
+
+### Analysis
+- CNN
+- CNN + Att 
+- CNN + Att + LSTM
+- RF with no timeseries data
+- RF + timeseries data
 
 ---
 ![oc_germany](https://github.com/moienr/SoilNet/blob/da789f2bf2f2df5dacca6b44ea2be63ed516e54f/dataset/oc_histogram.png)
