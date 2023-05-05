@@ -1,10 +1,24 @@
 # SoilNet
 
 
-## TODO LIST
+## Experiments
 
-| TODO | <span style="color:#44ff44">DONE</span> | <span style="color:#ff4444; text-decoration:line-through">DISCARDED</span> |
-| -------- | -------- | -------- |
+| USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
+|--------|----------|----------|--------|--------------|
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+
+| USE_SA | USE_LSTM | USE_SRTM | OC_MAX | RUN |
+|--------|----------|----------|--------|-----|
+| <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> |
 
 
 
