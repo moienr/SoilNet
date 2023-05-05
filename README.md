@@ -5,7 +5,7 @@
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
 |--------|----------|----------|--------|--------------|
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|   [x]  |    [ ]   |    [x]   |   [ ]  |      RUN17        |
 |   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
 |   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
 |   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
@@ -16,9 +16,19 @@
 |   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
 |   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
 
-| USE_SA | USE_LSTM | USE_SRTM | OC_MAX | RUN |
-|--------|----------|----------|--------|-----|
-| <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> | <div style="width: 80px"><input type="checkbox"></div> |
+
+| USE_SA | USE_LSTM | USE_SRTM | OC_MAX | RUN   |
+|--------|----------|----------|--------|-------|
+| <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> |
+| <center>[ ]</center> | <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[x]</center> |
+| <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> |
+| <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[x]</center> |
+| <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> |
+| <center>[ ]</center> | <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> |
+| <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> |
+| <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> |
+| <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> |
+| <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> |
 
 
 
