@@ -26,6 +26,7 @@
 - ~~Add Spatial Attention Module~~
 - ~~FCNN + Regressor~~
 - ~~FCNN + SA + Regressor~~
+- ~~LSTM~~
 
 ### DATASET
 - ~~Add TerraClimate Dataset~~
