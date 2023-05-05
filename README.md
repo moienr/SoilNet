@@ -5,30 +5,19 @@
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
 |--------|----------|----------|--------|--------------|
-|   [x]  |    [ ]   |    [x]   |   [ ]  |      RUN17        |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
-|   [ ]  |    [ ]   |    [ ]   |   [ ]  |              |
+|    X   |          |     X    |   X    |      RUN_D_2023_05_04_T_13_27_Moien        |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
+|        |          |          |        |              |
 
 
-| USE_SA | USE_LSTM | USE_SRTM | OC_MAX | RUN   |
-|--------|----------|----------|--------|-------|
-| <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> |
-| <center>[ ]</center> | <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[x]</center> |
-| <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> |
-| <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[x]</center> |
-| <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> |
-| <center>[ ]</center> | <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> |
-| <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> |
-| <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> |
-| <center>[x]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[ ]</center> | <center>[x]</center> |
-| <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> | <center>[x]</center> | <center>[ ]</center> |
+
 
 
 
