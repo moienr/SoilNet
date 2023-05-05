@@ -59,7 +59,7 @@ class SNDatasetClimate(Dataset):
                         '20130701', '20130801', '20130901', '20131001', '20131101', '20131201',
                         '20140101', '20140201', '20140301', '20140401', '20140501', '20140601',
                         '20140701', '20140801', '20140901', '20141001', '20141101', '20141201', '20150101'],
-               climate_dtype = torch.float32
+               climate_dtype = torch.float32, normalize_climate = True
                ):
     """_summary_
 
@@ -90,8 +90,11 @@ class SNDatasetClimate(Dataset):
     # List all files in the directory and filter for .csv files
     csv_files = [f for f in os.listdir(climate_csv_folder) if os.path.isfile(os.path.join(climate_csv_folder, f)) and f.endswith('.csv')]
     self.clim_dfs =  [pd.read_csv(os.path.join(climate_csv_folder, f)) for f in csv_files]
-    norm_clim = NormalizeClimDF(dates=dates)
-    self.clim_dfs = [norm_clim(clim_df) for clim_df in self.clim_dfs]
+    
+    if normalize_climate:
+        norm_clim = NormalizeClimDF(dates=dates)
+        self.clim_dfs = [norm_clim(clim_df) for clim_df in self.clim_dfs]
+    
     self.dates = dates
     self.clim_dtype = climate_dtype
     
