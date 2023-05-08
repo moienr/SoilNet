@@ -7,6 +7,7 @@ from dataset.utils.utils import TextColors as tc
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import os
+from torchmetrics import R2Score
 
 class RMSELoss(nn.Module):
     def __init__(self):
@@ -206,7 +207,7 @@ def train(model: torch.nn.Module,
         else:
             pass
     results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False)) 
-    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Loss(), verbose=False)) 
+    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score(), verbose=False)) 
     # Save the model
     if save_model_path:
         save_checkpoint(model, optimizer, filename=save_model_path)
