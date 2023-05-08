@@ -207,7 +207,7 @@ def train(model: torch.nn.Module,
         else:
             pass
     results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False)) 
-    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score(), verbose=False)) 
+    results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score().to(device), verbose=False)) 
     # Save the model
     if save_model_path:
         save_checkpoint(model, optimizer, filename=save_model_path)
