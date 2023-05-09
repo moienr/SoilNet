@@ -6,6 +6,7 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
                            x_label="Epochs", y_label="RMSE",
                            min_max_bounds= True,
                            tight_x_lim = True, y_lim=None,
+                           train_legend = "Train", test_legend = "Test",
                            save_path=None)->None:
     """
     This function takes in train and test losses as inputs and plots them using matplotlib.
@@ -50,10 +51,10 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
 
     x_range = range(1, len(mean_train_losses) + 1)
     
-    plt.plot(x_range ,mean_train_losses, color='#33a9a5', linewidth=2, label='Train loss')
+    plt.plot(x_range ,mean_train_losses, color='#33a9a5', linewidth=2, label=train_legend)
     plt.fill_between(x_range, lower_train_losses, upper_train_losses, alpha=0.2, color='#33a9a5', edgecolor='none')
 
-    plt.plot(x_range ,mean_test_losses, color='#f27085', linewidth=2, label='Test loss')
+    plt.plot(x_range ,mean_test_losses, color='#f27085', linewidth=2, label=test_legend)
     plt.fill_between(x_range, lower_test_losses, upper_test_losses, alpha=0.2, color='#f27085', edgecolor='none')
 
     plt.legend()
