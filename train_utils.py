@@ -147,7 +147,8 @@ def train(model: torch.nn.Module,
           loss_fn: torch.nn.Module = RMSELoss(),
           epochs: int = 5,
           lr_scheduler: bool = None,
-          save_model_path = None
+          save_model_path = None,
+          save_model_if_mae_lower_than = None,
           ):
     """ Train the model and test it on the test set
     Note: If you don't have diffrent validation and test sets, just pass the same dataloader for both test and val
@@ -215,7 +216,11 @@ def train(model: torch.nn.Module,
     results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score().to(device), verbose=False)) 
     # Save the model
     if save_model_path:
-        save_checkpoint(model, optimizer, filename=save_model_path)
+        if save_model_if_mae_lower_than:
+            if results["MAE"][-1] < save_model_if_mae_lower_than:
+                save_checkpoint(model, optimizer, filename=save_model_path)
+        else:
+            save_checkpoint(model, optimizer, filename=save_model_path)
     # 6. Return the filled results at the end of the epochs
     return results
 
