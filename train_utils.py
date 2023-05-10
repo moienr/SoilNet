@@ -142,18 +142,21 @@ def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
 def train(model: torch.nn.Module, 
           train_dataloader: torch.utils.data.DataLoader, 
           test_dataloader: torch.utils.data.DataLoader, 
+          val_dataloader: torch.utils.data.DataLoader,
           optimizer: torch.optim.Optimizer,
           loss_fn: torch.nn.Module = RMSELoss(),
           epochs: int = 5,
           lr_scheduler: bool = None,
           save_model_path = None
           ):
-    """_summary_
+    """ Train the model and test it on the test set
+    Note: If you don't have diffrent validation and test sets, just pass the same dataloader for both test and val
 
     Args:
         model (torch.nn.Module): Pytorch model
         train_dataloader (torch.utils.data.DataLoader): train dataloader
         test_dataloader (torch.utils.data.DataLoader): test dataloader
+        val_dataloader (torch.utils.data.DataLoader): validation dataloader
         optimizer (torch.optim.Optimizer): optimizer
         loss_fn (torch.nn.Module, optional): Loss funciton. Defaults to RMSELoss().
         epochs (int, optional): Number of Epochs. Defaults to 5.
@@ -171,8 +174,9 @@ def train(model: torch.nn.Module,
         pass
     # 2. Create empty results dictionary
     results = {"train_loss": [],
-               "test_loss": [],
+               "val_loss": [],
                "MAE": [],
+               "RMSE": [],
                "R2": []
     }
     
@@ -183,8 +187,8 @@ def train(model: torch.nn.Module,
                                            data_loader=train_dataloader,
                                            loss_fn=loss_fn,
                                            optimizer=optimizer)
-        test_loss = test_step(model=model,
-            data_loader=test_dataloader,
+        val_loss = test_step(model=model,
+            data_loader=val_dataloader,
             loss_fn=loss_fn)
         
         # 4. Print out what's happening
@@ -192,21 +196,22 @@ def train(model: torch.nn.Module,
             tc.OKCYAN,
             f"Epoch {epoch} Results: | ",
             f"train_loss: {train_loss} | ",
-            f"test_loss: {test_loss} ",
+            f"val_loss: {val_loss} ",
             tc.ENDC
         )
         print("")
 
         # 5. Update results dictionary
         results["train_loss"].append(train_loss)
-        results["test_loss"].append(test_loss)
+        results["val_loss"].append(val_loss)
         if lr_scheduler == "step":
             scheduler.step()
         elif lr_scheduler == "plateau":
             scheduler.step(train_loss)
         else:
             pass
-    results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False)) 
+    results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False))
+    results["RMSE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=RMSELoss(), verbose=False))
     results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score().to(device), verbose=False)) 
     # Save the model
     if save_model_path:
@@ -219,12 +224,12 @@ def train(model: torch.nn.Module,
 
 def plot_losses(loss_dict):
     train_losses = loss_dict["train_loss"]
-    test_losses = loss_dict["test_loss"]
+    val_losses = loss_dict["val_loss"]
     epochs = range(1, len(train_losses) + 1)
 
     plt.plot(epochs, train_losses, label="Train Loss")
-    plt.plot(epochs, test_losses, label="Test Loss")
-    plt.title("Training and Test Loss")
+    plt.plot(epochs, val_losses, label="Val Loss")
+    plt.title("Training and Validation Loss")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.legend()
