@@ -231,6 +231,15 @@ class CNNFlattener64(nn.Module):
         x = self.last_conv(x).squeeze(-1).squeeze(-1) # flatten the output, don't just use squeeze() because it will remove the batch dimension if it is 1
         return x
     
+class BaseResNet(nn.Module):
+    def __init__(self, in_channels=14 ,out_nodes=1024):
+        super().__init__()
+        self.resnet = models.resnet101(weights=None)
+
+    def forward(self, x):
+        x = self.resnet(x)
+        return x
+      
   
 class ResNet101(nn.Module):
     def __init__(self, in_channels=14 ,out_nodes=1024):
@@ -319,8 +328,13 @@ if __name__ == "__main__": # testing the model
     print("Testing Resnet101+GLAM...")
     test_resnet101_glam(device=device)
 
-    resnet = ResNet101GLAM()
+    
+    
+    print("Testing BaseResnet...")
+    resnet = BaseResNet().to(device)
     from torchinfo import summary
-    summary(resnet, input_size=(16, 14, 64, 64), device=device,
+    summary(resnet, input_size=(1, 3, 224, 224), device=device,
             col_names=["input_size", "output_size", "num_params"], col_width=20,
             row_settings=["var_names"],depth=4)
+    
+    
