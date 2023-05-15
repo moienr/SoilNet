@@ -254,6 +254,20 @@ class ResNet101(nn.Module):
         x = self.relu(x)
         return x
     
+class ResNet101V2(nn.Module):
+    def __init__(self, in_channels=14 ,out_nodes=1024):
+        super().__init__()
+        self.resnet = models.resnet101(weights=None)
+        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=1, padding=3,
+                               bias=False)
+        self.resnet.maxpool = nn.Identity()
+        self.relu = nn.LeakyReLU()
+        self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
+    def forward(self, x):
+        x = self.resnet(x)
+        x = self.relu(x)
+        return x
+
 class ResNet101GLAM(nn.Module):
     """ ### Resnet but with added GLAM layer
     
@@ -274,6 +288,42 @@ class ResNet101GLAM(nn.Module):
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.resnet.layer2 = nn.Sequential(self.resnet.layer2,
+                                           glam)
+    
+        self.relu = nn.LeakyReLU()
+        self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x (torch.Tensor): a batch of images with shape (batch_size, in_channels, image_size, image_size)
+        Returns:
+            torch.Tensor s: a batch of features with shape (batch_size, out_nodes)
+        """
+        x = self.resnet(x)
+        x = self.relu(x)
+        return x
+    
+class ResNet101V2GLAM(nn.Module):
+    """ ### Resnet but with added GLAM layer
+    
+    GLAM in the original paper is applied at the end of the resnet 101, at a layer where the feature map is 8x8.
+    But in this case,Since our input is a 64x64 image instead of 256x256, we want to apply it at the end of the first resnet block,
+    so that the feature map is 8x8. This is done by adding a GLAM layer after the first resnet block.
+    """
+    def __init__(self, in_channels=14 ,out_nodes=1024):
+        """
+
+        Args:
+            in_channels (int, optional): The number of input channels in the image. Defaults to 14.
+            out_nodes (int, optional): The number of output nodes (Dense Layer). Defaults to 1024.
+        """
+        super().__init__()
+        glam = GLAM(in_channels=2048, num_reduced_channels=32, feature_map_size=8, kernel_size=5)
+        self.resnet = models.resnet101(weights=None)
+        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=1, padding=3,
+                               bias=False)
+        self.resnet.maxpool = nn.Identity() # remove maxpooling
+        self.resnet.layer4 = nn.Sequential(self.resnet.layer4,
                                            glam)
     
         self.relu = nn.LeakyReLU()
@@ -330,10 +380,10 @@ if __name__ == "__main__": # testing the model
 
     
     
-    print("Testing BaseResnet...")
-    resnet = BaseResNet().to(device)
+    print("Summary...")
+    resnet = ResNet101V2GLAM().to(device)
     from torchinfo import summary
-    summary(resnet, input_size=(1, 3, 224, 224), device=device,
+    summary(resnet, input_size=(1, 14, 64, 64), device=device,
             col_names=["input_size", "output_size", "num_params"], col_width=20,
             row_settings=["var_names"],depth=4)
     
