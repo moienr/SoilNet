@@ -275,7 +275,7 @@ class ResNet101GLAM(nn.Module):
     But in this case,Since our input is a 64x64 image instead of 256x256, we want to apply it at the end of the first resnet block,
     so that the feature map is 8x8. This is done by adding a GLAM layer after the first resnet block.
     """
-    def __init__(self, in_channels=14 ,out_nodes=1024):
+    def __init__(self, in_channels=14 ,out_nodes=1024, glam_reduce_channels = 32):
         """
 
         Args:
@@ -283,7 +283,7 @@ class ResNet101GLAM(nn.Module):
             out_nodes (int, optional): The number of output nodes (Dense Layer). Defaults to 1024.
         """
         super().__init__()
-        glam = GLAM(in_channels=512, num_reduced_channels=32, feature_map_size=8, kernel_size=5)
+        glam = GLAM(in_channels=512, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
         self.resnet = models.resnet101(weights=None)
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
@@ -310,7 +310,7 @@ class ResNet101V2GLAM(nn.Module):
     But in this case,Since our input is a 64x64 image instead of 256x256, we want to apply it at the end of the first resnet block,
     so that the feature map is 8x8. This is done by adding a GLAM layer after the first resnet block.
     """
-    def __init__(self, in_channels=14 ,out_nodes=1024):
+    def __init__(self, in_channels=14 ,out_nodes=1024, glam_reduce_channels = 64):
         """
 
         Args:
@@ -318,7 +318,7 @@ class ResNet101V2GLAM(nn.Module):
             out_nodes (int, optional): The number of output nodes (Dense Layer). Defaults to 1024.
         """
         super().__init__()
-        glam = GLAM(in_channels=2048, num_reduced_channels=32, feature_map_size=8, kernel_size=5)
+        glam = GLAM(in_channels=2048, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
         self.resnet = models.resnet101(weights=None)
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=1, padding=3,
                                bias=False)
@@ -385,6 +385,6 @@ if __name__ == "__main__": # testing the model
     from torchinfo import summary
     summary(resnet, input_size=(1, 14, 64, 64), device=device,
             col_names=["input_size", "output_size", "num_params"], col_width=20,
-            row_settings=["var_names"],depth=4)
+            row_settings=["var_names"],depth=5)
     
     
