@@ -237,6 +237,8 @@ class RFTransform:
     """
     Input:
     - sample (tuple): A tuple containing the image and the target value.
+    - oc_max (int or float): The maximum value of the target array. Default is 87.
+    - oc_min (int or float): The minimum value of the target array. Default is 0.
     Returns:
     - A tuple containing the reshaped image and the target value, in the form of a numpy array.
     """
