@@ -233,7 +233,7 @@ class RFTransform:
     """
     pass
 
-  def __call__(self,sample):
+  def __call__(self,sample, oc_max = 87, oc_min = 0):
     """
     Input:
     - sample (tuple): A tuple containing the image and the target value.
@@ -244,6 +244,10 @@ class RFTransform:
     
     # reshaping the image into (bands, height, width)
     img = reshape_array(img)
+    
+    # Cliping oc values to be between 0 and 87
+    oc = oc if oc < oc_max else oc_max
+    oc = oc if oc > oc_min else oc_min
     
     # IMPORTANT : Replacing NaN values with 0, Just a NAN pixel in the input image will cause the whole image to be NaN in the output
     img[np.isnan(img)] = 0
