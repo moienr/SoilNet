@@ -227,10 +227,17 @@ class RFTransform:
   """
   This class is used to transform the image and the target value to be used in the Random Forest model.
   """
-  def __init__(self):
+  def __init__(self, oc_max = 87, oc_min = 0):
     """
     This class is used to transform the image and the target value to be used in the Random Forest model.
+    
+    input:
+    -----
+    - oc_max (int or float): The maximum value of the target array. Default is 87.
+    - oc_min (int or float): The minimum value of the target array. Default is 0.
     """
+    self.oc_max = oc_max
+    self.oc_min = oc_min
     pass
 
   def __call__(self,sample):
@@ -244,6 +251,10 @@ class RFTransform:
     
     # reshaping the image into (bands, height, width)
     img = reshape_array(img)
+    
+    # Cliping oc values to be between 0 and 87
+    oc = oc if oc < self.oc_max else self.oc_max
+    oc = oc if oc > self.oc_min else self.oc_min
     
     # IMPORTANT : Replacing NaN values with 0, Just a NAN pixel in the input image will cause the whole image to be NaN in the output
     img[np.isnan(img)] = 0
