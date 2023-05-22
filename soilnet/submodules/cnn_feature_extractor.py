@@ -283,12 +283,12 @@ class ResNet101GLAM(nn.Module):
             out_nodes (int, optional): The number of output nodes (Dense Layer). Defaults to 1024.
         """
         super().__init__()
-        glam = GLAM(in_channels=512, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
+        self.glam = GLAM(in_channels=512, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
         self.resnet = models.resnet101(weights=None)
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
         self.resnet.layer2 = nn.Sequential(self.resnet.layer2,
-                                           glam)
+                                           self.glam)
     
         self.relu = nn.LeakyReLU()
         self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
@@ -318,13 +318,13 @@ class ResNet101V2GLAM(nn.Module):
             out_nodes (int, optional): The number of output nodes (Dense Layer). Defaults to 1024.
         """
         super().__init__()
-        glam = GLAM(in_channels=2048, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
+        self.glam = GLAM(in_channels=2048, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
         self.resnet = models.resnet101(weights=None)
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=1, padding=3,
                                bias=False)
         self.resnet.maxpool = nn.Identity() # remove maxpooling
         self.resnet.layer4 = nn.Sequential(self.resnet.layer4,
-                                           glam)
+                                           self.glam)
     
         self.relu = nn.LeakyReLU()
         self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
