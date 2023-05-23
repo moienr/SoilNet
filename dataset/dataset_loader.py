@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from utils.utils import reshape_tensor, reshape_array, get_df_max_min, normalize
 
 class SNDataset(Dataset):
-  def __init__(self, l8_dir, csv_dir , l8_bands: list = None ,transform = None):
+  def __init__(self, l8_dir, csv_dir , l8_bands: list = None ,transform = None, return_point_id = False):
     # Declaring them becuase we nee them in __getitem__ function
     self.l8_dir = l8_dir
     self.csv_dir = csv_dir
@@ -23,7 +23,7 @@ class SNDataset(Dataset):
     self.transform = transform
     # Reading the csv file in __init__ function to avoid reading it in every __getitem__ call
     self.df = pd.read_csv(self.csv_dir)
-
+    self.return_point_id = return_point_id
   def __len__(self):
     return len(self.l8_names)
   def __getitem__(self, index):
@@ -39,12 +39,14 @@ class SNDataset(Dataset):
     l8_img = io.imread(l8_img_path)
     if self.l8_bands: l8_img = l8_img[self.l8_bands,:,:]
 
-
-
     if self.transform:
         l8_img,oc  = self.transform((l8_img,oc))
-        
-    return l8_img,oc
+    
+    # Returning the point_id as well if return_point_id is True | Used in the test phase
+    if self.return_point_id:
+        return l8_img,oc,point_id
+    else:
+        return l8_img,oc
   
 class SNDatasetClimate(Dataset):
   def __init__(self, l8_dir, csv_dir , climate_csv_folder,
@@ -59,8 +61,7 @@ class SNDatasetClimate(Dataset):
                         '20130701', '20130801', '20130901', '20131001', '20131101', '20131201',
                         '20140101', '20140201', '20140301', '20140401', '20140501', '20140601',
                         '20140701', '20140801', '20140901', '20141001', '20141101', '20141201', '20150101'],
-               climate_dtype = torch.float32, normalize_climate = True
-               ):
+               climate_dtype = torch.float32, normalize_climate = True, return_point_id = False):
     """_summary_
 
     Args:
@@ -98,6 +99,8 @@ class SNDatasetClimate(Dataset):
     self.dates = dates
     self.clim_dtype = climate_dtype
     
+    self.return_point_id = return_point_id
+    
   def __len__(self):
     return len(self.l8_names)
   
@@ -122,8 +125,11 @@ class SNDatasetClimate(Dataset):
     if self.transform:
         l8_img,oc  = self.transform((l8_img,oc))
         clim_arr = torch.tensor(clim_arr).to(dtype=self.clim_dtype)
-        
-    return (l8_img,clim_arr),oc
+      
+    if self.return_point_id:
+        return (l8_img,clim_arr),oc, point_id
+    else:
+        return (l8_img,clim_arr),oc
   
 #############################################################################################################    
 ############################################# Transformations ###############################################    
