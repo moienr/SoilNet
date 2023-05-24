@@ -71,6 +71,20 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     plt.show()
 
 
+def normalize(x):
+    return (x - x.min()) / (x.max() - x.min())
+def convert2uint8(x):
+    return (x * 255).astype(np.uint8)
+
+def display_images(array1, array2, names, title, figsize = (10,5)):
+    fig, axs = plt.subplots(1, 2, figsize=figsize)
+    for ax, array, name in zip(axs, [array1, array2], names):
+        ax.imshow(array)
+        ax.set_title(name)
+        ax.tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
+    fig.suptitle(title)
+    plt.show()
+
 if __name__ == "__main__":
     train_losses = np.random.random((10, 100)) * np.geomspace(100, 1, num=100, endpoint=True)  /100 
     test_losses = np.random.random((10, 100)) * np.geomspace(100, 1, num=100, endpoint=True)  /100 + np.linspace(.1, 0, num=100, endpoint=True) + 0.05
