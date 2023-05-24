@@ -180,7 +180,11 @@ def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
     }
     torch.save(checkpoint, filename)
 
-
+def load_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
+    print("=> Loading checkpoint")
+    checkpoint = torch.load(filename)
+    model.load_state_dict(checkpoint["state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer"])
 
 # 1. Take in various parameters required for training and test steps
 def train(model: torch.nn.Module, 
