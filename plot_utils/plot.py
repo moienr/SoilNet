@@ -76,13 +76,17 @@ def normalize(x):
 def convert2uint8(x):
     return (x * 255).astype(np.uint8)
 
-def display_images(array1, array2, names, title, figsize = (10,5)):
+def display_images(array1, array2, names, title, figsize = (10,5), savepath=None):
     fig, axs = plt.subplots(1, 2, figsize=figsize)
     for ax, array, name in zip(axs, [array1, array2], names):
         ax.imshow(array)
         ax.set_title(name)
         ax.tick_params(axis='both', which='both', bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
     fig.suptitle(title)
+    # tighten the plot
+    fig.tight_layout()
+    if savepath:
+        plt.savefig(savepath, bbox_inches='tight')
     plt.show()
 
 if __name__ == "__main__":
