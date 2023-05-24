@@ -115,18 +115,61 @@ def test_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, verbos
             else:
                 raise ValueError(f"Input of the netowrk must be either a Tensor or a Tuple of Tensors but it is: {type(X)}")
             y_pred = model(X)
-            loss = loss_fn(y_pred, y.unsqueeze(1))
+            loss = loss_fn(y_pred, y.unsqueeze(1)) # y_pred is of shape (batch_size, 1) and y is of shape (batch_size) -> unsqueeze y to (batch_size, 1)
             test_loss += loss.item()
             
             # if batch % 2 == 0:
             #     loss, current = loss.item(), batch * len(X)
             #     print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
-
+            
     test_loss /= len(data_loader)
     if verbose:
         print(f"Test Loss: {test_loss:>8f}%")
         print(y_pred.shape, y.shape)
     return test_loss
+
+
+
+import pandas as pd
+
+def test_step_w_id(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module, csv_file: str = "test.csv", verbose: bool = False):
+    size = len(data_loader.dataset)
+    model.eval()
+    test_loss = 0
+    results = []  # Store results for CSV
+
+    with torch.inference_mode():
+        for batch, (X, y, point_id) in enumerate(data_loader):
+            # Send data to target device
+            if isinstance(X, tuple) or isinstance(X, list): # if it's a tuple, it has the climate data in it
+                X = [tensor.to(device) for tensor in list(X)]
+                y = y.to(device)
+            elif isinstance(X, torch.Tensor): # if it's a tensor, it's only the Image data
+                X, y = X.to(device), y.to(device)
+            else:
+                raise ValueError(f"Input of the network must be either a Tensor or a Tuple of Tensors but it is: {type(X)}")
+
+            y_pred = model(X)
+            loss = loss_fn(y_pred, y.unsqueeze(1))
+            test_loss += loss.item()
+
+            # Save results for CSV
+            if csv_file:
+                y_pred = y_pred.squeeze(1)  # Remove the extra dimension from y_pred
+                for i in range(len(point_id)):
+                    results.append({'point_id': point_id[i], 'y_real': y[i].item(), 'y_pred': y_pred[i].item()})
+
+    test_loss /= len(data_loader)
+    if verbose:
+        print(f"Test Loss: {test_loss:>8f}%")
+        print(y_pred.shape, y.shape)
+
+    # Save CSV
+    if csv_file:
+        df = pd.DataFrame(results)
+        df.to_csv(csv_file, index=False)
+
+    #return test_loss
 
 
 def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
@@ -136,6 +179,7 @@ def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
         "optimizer": optimizer.state_dict(),
     }
     torch.save(checkpoint, filename)
+
 
 
 # 1. Take in various parameters required for training and test steps
