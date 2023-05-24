@@ -24,3 +24,18 @@ class GlobalSpatialAttention(nn.Module):
         att = self.conv1x1_att(att)
         
         return (global_channel_output * att) + global_channel_output
+
+
+if __name__ == '__main__':
+    # Test
+    in_channels = 128
+    num_reduced_channels = 32
+    N = 4 # batch size
+    C = 64
+    H = 32
+    W = 32
+    feature_maps = torch.randn(N, C, H, W)
+    global_channel_output = torch.randn(N, C, H, W)
+    gsa = GlobalSpatialAttention(in_channels, num_reduced_channels)
+    output = gsa(feature_maps, global_channel_output)
+    print(output.shape)
