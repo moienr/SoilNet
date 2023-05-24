@@ -289,3 +289,19 @@ def plot_losses(loss_dict):
     plt.ylabel("Loss")
     plt.legend()
     plt.show()
+    
+    
+class BatchLoader(torch.utils.data.Dataset): 
+    """ Takes in a Pytorch DataLoader and returns any batch using index
+    """
+    def __init__(self, dataloader):
+        self.dataloader = dataloader
+
+    def __len__(self):
+        return len(self.dataloader)
+
+    def __call__(self, index):
+        for i, batch in enumerate(self.dataloader):
+            if i == index:
+                return batch
+        raise IndexError("Index out of range")
