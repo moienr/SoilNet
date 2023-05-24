@@ -173,18 +173,20 @@ def test_step_w_id(model: nn.Module, data_loader: DataLoader, loss_fn: nn.Module
 
 
 def save_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
-    print("=> Saving checkpoint")
+    print("Saving checkpoint=> ", end="")
     checkpoint = {
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict(),
     }
     torch.save(checkpoint, filename)
-
+    print("Done!")
+    
 def load_checkpoint(model, optimizer, filename="my_checkpoint.pth.tar"):
-    print("=> Loading checkpoint")
+    print("Loading checkpoint=> ", end="")
     checkpoint = torch.load(filename)
     model.load_state_dict(checkpoint["state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer"])
+    print("Done!")
 
 # 1. Take in various parameters required for training and test steps
 def train(model: torch.nn.Module, 
