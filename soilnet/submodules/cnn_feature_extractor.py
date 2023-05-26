@@ -381,10 +381,10 @@ if __name__ == "__main__": # testing the model
     
     
     print("Summary...")
-    resnet = ResNet101V2GLAM().to(device)
+    resnet = ResNet101GLAM().to(device)
     from torchinfo import summary
     summary(resnet, input_size=(1, 14, 64, 64), device=device,
-            col_names=["input_size", "output_size", "num_params"], col_width=20,
+            col_names=["input_size","kernel_size", "output_size", "num_params"], col_width=20,
             row_settings=["var_names"],depth=5)
     
     
