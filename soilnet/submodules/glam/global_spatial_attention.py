@@ -26,16 +26,23 @@ class GlobalSpatialAttention(nn.Module):
         return (global_channel_output * att) + global_channel_output
 
 
+
+import unittest
+class TestGlobalSpatialAttention(unittest.TestCase):
+    
+    def setUp(self):
+        self.batch_size = 2
+        self.in_channels = 3
+        self.num_reduced_channels = 2
+        self.height = 4
+        self.width = 4
+        self.attention = GlobalSpatialAttention(self.in_channels, self.num_reduced_channels)
+        self.feature_maps = torch.randn(self.batch_size, self.in_channels, self.height, self.width)
+        self.global_channel_output = torch.randn(self.batch_size, self.in_channels, 1, 1)
+        
+    def test_forward(self):
+        output = self.attention(self.feature_maps, self.global_channel_output)
+        self.assertEqual(output.shape, self.global_channel_output.shape)
+            
 if __name__ == '__main__':
-    # Test
-    in_channels = 128
-    num_reduced_channels = 32
-    N = 4 # batch size
-    C = 64
-    H = 32
-    W = 32
-    feature_maps = torch.randn(N, C, H, W)
-    global_channel_output = torch.randn(N, C, H, W)
-    gsa = GlobalSpatialAttention(in_channels, num_reduced_channels)
-    output = gsa(feature_maps, global_channel_output)
-    print(output.shape)
+    unittest.main()
