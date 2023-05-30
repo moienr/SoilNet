@@ -35,7 +35,7 @@ class RNN(nn.Module):
         - out (torch.Tensor): the output tensor of shape (batch_size, num_classes)
         """
         # Set initial hidden states
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) .to(device)
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)
         # x: (n, seq, input), 
         # h0: (rnn_layers, n, hiden_size)
         
@@ -82,7 +82,7 @@ class GRU(nn.Module):
         - out (torch.Tensor): the output tensor of shape (batch_size, num_classes)
         """
         # Set initial hidden states
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size) .to(device)
+        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size)
         # x: (n, seq, input), 
         # h0: (gru_layers, n, hiden_size)
         
@@ -173,3 +173,8 @@ if __name__ == '__main__':
     x = torch.randn(32, 12, 10).to(device)  # Move the input tensor to the device
     y = model(x)
     print(y.shape)
+    from torchinfo import summary
+    model = LSTM(10, 128, 2, 64).to(device)
+    summary(model, input_size=(32, 12, 10), device = device, 
+            col_names=["input_size","kernel_size", "output_size", "num_params"], col_width=20,
+            row_settings=["var_names"],depth=2)
