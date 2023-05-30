@@ -56,7 +56,7 @@ class Regressor(nn.Module):
 
 
     
-#TODO: FIX : https://pytorch.org/docs/stable/generated/torch.nn.ModuleList.html
+# Moduel Lists: FIX : https://pytorch.org/docs/stable/generated/torch.nn.ModuleList.html
     
 class MultiHeadRegressor(nn.Module):
     """
