@@ -58,7 +58,7 @@ class Regressor(nn.Module):
     
 # Moduel Lists: FIX : https://pytorch.org/docs/stable/generated/torch.nn.ModuleList.html
     
-class MultiHeadRegressor(nn.Module):
+class MultiHeadRegressorBase(nn.Module):
     """
     A multi-head regressor that can take any number of input from branchesa and encodes each input to a common space of size `hidden_size` and maps the concatenated output to a scalar output.
 
@@ -120,26 +120,32 @@ class MultiHeadRegressor(nn.Module):
         x = self.output_fc(x)
         return x
 
-class MultiHeadRegressorV2(MultiHeadRegressor):
-    def __init__(self, *input_sizes:int, hidden_size=128, activation="sigmoid", dropout_prob=0.5):
+class MultiHeadRegressor(MultiHeadRegressorBase):
+    def __init__(self, *input_sizes:int, hidden_size=128, activation="sigmoid",version = 1, dropout_prob=0.5):
         super().__init__(*input_sizes, hidden_size=hidden_size, activation=activation)
-
-        self.encoders = self.encoders = nn.ModuleList([nn.Sequential(
-            nn.Linear(in_size, hidden_size),
-            nn.Dropout(dropout_prob)
-        ) for in_size in input_sizes])
-
-
-        self.concat_fc = nn.Sequential(
-            nn.Linear(len(input_sizes)*hidden_size, hidden_size),
-            nn.Dropout(0.25),
-            self.activ,
-            nn.Linear(hidden_size, hidden_size//4)
-        )
         
-        self.output_fc = nn.Sequential(
-            nn.Linear(hidden_size//4, 1),
-            nn.ReLU())
+        if version not in [1, 2]:
+            raise ValueError("Version is invalid, please choose from 1 or 2.")
+                
+        
+        self.version = version
+        if version == 2:
+            self.encoders = self.encoders = nn.ModuleList([nn.Sequential(
+                nn.Linear(in_size, hidden_size),
+                nn.Dropout(dropout_prob)
+            ) for in_size in input_sizes])
+
+
+            self.concat_fc = nn.Sequential(
+                nn.Linear(len(input_sizes)*hidden_size, hidden_size),
+                nn.Dropout(0.25),
+                self.activ,
+                nn.Linear(hidden_size, hidden_size//4)
+            )
+            
+            self.output_fc = nn.Sequential(
+                nn.Linear(hidden_size//4, 1),
+                nn.ReLU())
 
 
     def forward(self, *inputs:torch.Tensor) -> torch.Tensor:
@@ -166,14 +172,6 @@ if __name__ == "__main__":
     w = model(x,y,z)
     print(w.shape)
     
-    print("Testing MultiHeadRegressorV2...")
-    x = torch.randn((32,1024)).to(device)
-    y = torch.rand((32,12)).to(device)
-    z = torch.rand((32, 5)).to(device)
-    model = MultiHeadRegressorV2(1024, 12, 5, hidden_size=128).to(device)
-
-    w = model(x,y,z)
-    print(w.shape)
     
     # model = MultiHeadRegressor(1024, 12, 5, hidden_size=128).to(device)
     # for param in model.parameters():
