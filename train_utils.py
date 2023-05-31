@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import os
 from torchmetrics import R2Score
 
+
 class RMSELoss(nn.Module):
     def __init__(self):
         super().__init__()
