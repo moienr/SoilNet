@@ -120,6 +120,32 @@ class MultiHeadRegressor(nn.Module):
         x = self.output_fc(x)
         return x
 
+class MultiHeadRegressorV2(MultiHeadRegressor):
+    def __init__(self, *input_sizes:int, hidden_size=128, activation="sigmoid", dropout_prob=0.5):
+        super().__init__(*input_sizes, hidden_size=hidden_size, activation=activation)
+
+        self.encoders = self.encoders = nn.ModuleList([nn.Sequential(
+            nn.Linear(in_size, hidden_size),
+            nn.Dropout(dropout_prob)
+        ) for in_size in input_sizes])
+
+
+        self.concat_fc = nn.Sequential(
+            nn.Linear(len(input_sizes)*hidden_size, hidden_size),
+            nn.Dropout(0.25),
+            self.activ,
+            nn.Linear(hidden_size, hidden_size//4)
+        )
+        
+        self.output_fc = nn.Sequential(
+            nn.Linear(hidden_size//4, 1),
+            nn.ReLU())
+
+
+    def forward(self, *inputs:torch.Tensor) -> torch.Tensor:
+        x = super().forward(*inputs)
+        return x
+
 
 if __name__ == "__main__":
     print('Checking device: ')
@@ -136,6 +162,15 @@ if __name__ == "__main__":
     y = torch.rand((32,12)).to(device)
     z = torch.rand((32, 5)).to(device)
     model = MultiHeadRegressor(1024, 12, 5, hidden_size=128).to(device)
+
+    w = model(x,y,z)
+    print(w.shape)
+    
+    print("Testing MultiHeadRegressorV2...")
+    x = torch.randn((32,1024)).to(device)
+    y = torch.rand((32,12)).to(device)
+    z = torch.rand((32, 5)).to(device)
+    model = MultiHeadRegressorV2(1024, 12, 5, hidden_size=128).to(device)
 
     w = model(x,y,z)
     print(w.shape)
