@@ -6,7 +6,7 @@ from submodules import rnn
 from typing import Tuple
 
 class ResNet(nn.Module):
-    def __init__(self, resnet_architecture = "101" , resnet_version = "v2",
+    def __init__(self, resnet_architecture = "101" , resnet_version = "v2", reg_version = 1,
                  cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, hidden_size=128):
         super().__init__()
         if resnet_architecture == "101":
@@ -28,7 +28,7 @@ class ResNet(nn.Module):
         else:
             raise ValueError("Invalid resnet architecture. Please choose from '101' or '101+GLAM'.")
         
-        self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size)
+        self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size, version=reg_version)
     def forward(self, raster_stack):
         """
         Forward pass of the Resnet module.
@@ -45,8 +45,8 @@ class ResNet(nn.Module):
         return output
         
 class ResNetLSTM(nn.Module):
-    def __init__(self, resnet_architecture = "101" , resnet_version = "v2",
-                 cnn_in_channels = 14 ,regresor_input_from_cnn = 1024,
+    def __init__(self, resnet_architecture = "101" , resnet_version = "v2", reg_version = 1,
+                 cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, 
                  lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128):
         
         super().__init__()
@@ -72,7 +72,7 @@ class ResNetLSTM(nn.Module):
         
         self.lstm = rnn.LSTM(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
         
-        self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size)
+        self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size, version=reg_version)
         
     def forward(self, input_raster_ts: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         """
