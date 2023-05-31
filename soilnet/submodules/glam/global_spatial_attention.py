@@ -10,6 +10,8 @@ class GlobalSpatialAttention(nn.Module):
         self.conv1x1_v = nn.Conv2d(in_channels, num_reduced_channels, 1, 1)
         self.conv1x1_att = nn.Conv2d(num_reduced_channels, in_channels, 1, 1)
         
+        self.att = None # for visualization later in the notebook
+        
     def forward(self, feature_maps, global_channel_output):
         query = self.conv1x1_q(feature_maps)
         N, C, H, W = query.shape
@@ -20,10 +22,10 @@ class GlobalSpatialAttention(nn.Module):
         query_key = query_key.reshape(N, -1).softmax(-1)
         query_key = query_key.reshape(N, int(H*W), int(H*W))
         value = self.conv1x1_v(feature_maps).reshape(N, C, -1)
-        att = torch.bmm(value, query_key).reshape(N, C, H, W)
-        att = self.conv1x1_att(att)
+        self.att = torch.bmm(value, query_key).reshape(N, C, H, W)
+        self.att = self.conv1x1_att(self.att)
         
-        return (global_channel_output * att) + global_channel_output
+        return (global_channel_output * self.att) + global_channel_output
 
 
 
