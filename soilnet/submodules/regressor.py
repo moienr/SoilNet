@@ -132,13 +132,13 @@ class MultiHeadRegressor(MultiHeadRegressorBase):
         if version == 2:
             self.encoders = self.encoders = nn.ModuleList([nn.Sequential(
                 nn.Linear(in_size, hidden_size),
-                nn.Dropout(dropout_prob)
+                #nn.Dropout(dropout_prob)
             ) for in_size in input_sizes])
 
 
             self.concat_fc = nn.Sequential(
                 nn.Linear(len(input_sizes)*hidden_size, hidden_size),
-                nn.Dropout(0.25),
+                nn.Dropout(dropout_prob//2),
                 self.activ,
                 nn.Linear(hidden_size, hidden_size//4)
             )
