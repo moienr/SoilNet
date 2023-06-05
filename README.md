@@ -1,7 +1,7 @@
 # SoilNet
 
 
-## Experiments
+<!-- ## Experiments
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
 |  :---:  |  :---:   |  :---:   |  :---:   |    :---:    |
@@ -14,7 +14,7 @@
 |        |          |          |        |              |
 |        |          |          |        |              |
 |        |          |          |        |              |
-|        |          |          |        |              |
+|        |          |          |        |              | -->
 
 
 
