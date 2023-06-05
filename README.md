@@ -22,16 +22,16 @@
 
 
 
-### MODEL
+<!-- ### MODEL
 - ~~Add Spatial Attention Module~~
 - ~~FCNN + Regressor~~
 - ~~FCNN + SA + Regressor~~
 - ~~LSTM~~
-
-### DATASET
+ -->
+<!-- ### DATASET
 - ~~Add TerraClimate Dataset~~
 - ~~Update the ClimateInformation.js (in processing)~~
-- ~~Write SRTM + Slope dataset donwlaoder~~
+- ~~Write SRTM + Slope dataset donwlaoder~~ -->
 
 ### Analysis
 - CNN
