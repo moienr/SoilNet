@@ -254,6 +254,27 @@ class ResNet101(nn.Module):
         x = self.relu(x)
         return x
     
+class baseVGG16(nn.Module):
+    def __init__(self, in_channels=14, out_nodes=1024):
+        super().__init__()
+        self.vgg16 = models.vgg16(weights=None)
+    def forward(self, x):
+        x = self.vgg16(x)
+        return x
+    
+class VGG16(nn.Module):
+    def __init__(self, in_channels=14, out_nodes=1024):
+        super().__init__()
+        self.vgg16 = models.vgg16(weights=None)
+        self.vgg16.features[0] = nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1)
+        self.relu = nn.LeakyReLU()
+        self.vgg16.classifier[6] = nn.Linear(4096, out_nodes)
+        
+    def forward(self, x):
+        x = self.vgg16(x)
+        x = self.relu(x)
+        return x
+    
 class ResNet101V2(nn.Module):
     def __init__(self, in_channels=14 ,out_nodes=1024):
         super().__init__()
@@ -363,6 +384,12 @@ def test_resnet101_glam(device="cpu"):
     resnet = ResNet101GLAM().to(device)
     output = resnet(x)
     print(output.shape)
+    
+def test_vgg16(device="cpu"):
+    x = torch.randn((16, 14, 64, 64)).to(device)
+    vgg16 = models.vgg16_bn(weights=None).to(device)
+    output = vgg16(x)
+    print(output.shape)
    
 if __name__ == "__main__": # testing the model
     if torch.cuda.is_available():   
@@ -377,13 +404,19 @@ if __name__ == "__main__": # testing the model
     test_resne101(device=device)
     print("Testing Resnet101+GLAM...")
     test_resnet101_glam(device=device)
-
     
+
+    # print("Summary...")
+    # resnet = ResNet101GLAM().to(device)
+    # from torchinfo import summary
+    # summary(resnet, input_size=(1, 14, 64, 64), device=device,
+    #         col_names=["input_size","kernel_size", "output_size", "num_params"], col_width=20,
+    #         row_settings=["var_names"],depth=5)
     
     print("Summary...")
-    resnet = ResNet101GLAM().to(device)
+    vgg = VGG16(in_channels=14).to(device)
     from torchinfo import summary
-    summary(resnet, input_size=(1, 14, 64, 64), device=device,
+    summary(vgg, input_size=(1, 14, 64, 64), device=device,
             col_names=["input_size","kernel_size", "output_size", "num_params"], col_width=20,
             row_settings=["var_names"],depth=5)
     
