@@ -1,32 +1,33 @@
 import torch
 import torch.nn as nn
-from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128, ResNet101, ResNet101GLAM, ResNet101V2, ResNet101V2GLAM
+from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128,\
+                                                ResNet101, ResNet101GLAM,\
+                                                    VGG16, VGG16GLAM
 from submodules.regressor import Regressor, MultiHeadRegressor
 from submodules import rnn
 from typing import Tuple
 
-class ResNet(nn.Module):
-    def __init__(self, resnet_architecture = "101" , resnet_version = "v2", reg_version = 1,
+class SoilNet(nn.Module):
+    def __init__(self, use_glam = False , cnn_arch = "resnet101", reg_version = 1,
                  cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, hidden_size=128):
         super().__init__()
-        if resnet_architecture == "101":
-            if resnet_version == "v1":
+        if use_glam:
+            if cnn_arch == "resnet101":
                 self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
-            elif resnet_version == "v2":
-                self.cnn = ResNet101V2(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "vgg16":
+                self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             else:
-                raise ValueError("Invalid resnet version. Please choose from 'v1' or 'v2'.")
+                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
 
-        elif resnet_architecture == "101+GLAM":
-            if resnet_version == "v1":
-                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
-            elif resnet_version == "v2":
-                self.cnn = ResNet101V2GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
-            else:
-                raise ValueError("Invalid resnet version. Please choose from 'v1' or 'v2'.")
-            
         else:
-            raise ValueError("Invalid resnet architecture. Please choose from '101' or '101+GLAM'.")
+            if cnn_arch == "resnet101":
+                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "vgg16":
+                self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            else:
+                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
+            
+
         
         self.reg = MultiHeadRegressor(regresor_input_from_cnn, hidden_size= hidden_size, version=reg_version)
     def forward(self, raster_stack):
@@ -44,31 +45,30 @@ class ResNet(nn.Module):
         output = self.reg(flat_raster)
         return output
         
-class ResNetLSTM(nn.Module):
-    def __init__(self, resnet_architecture = "101" , resnet_version = "v2", reg_version = 1,
+class SoilNetLSTM(nn.Module):
+    def __init__(self, use_glam = False  , cnn_arch = "resnet101", reg_version = 1,
                  cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, 
                  lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128):
         
         super().__init__()
         
-        if resnet_architecture == "101":
-            if resnet_version == "v1":
+        if use_glam:
+            if cnn_arch == "resnet101":
                 self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
-            elif resnet_version == "v2":
-                self.cnn = ResNet101V2(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "vgg16":
+                self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             else:
-                raise ValueError("Invalid resnet version. Please choose from 'v1' or 'v2'.")
+                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
 
-        elif resnet_architecture == "101+GLAM":
-            if resnet_version == "v1":
-                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
-            elif resnet_version == "v2":
-                self.cnn = ResNet101V2GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
-            else:
-                raise ValueError("Invalid resnet version. Please choose from 'v1' or 'v2'.")
-            
         else:
-            raise ValueError("Invalid resnet architecture. Please choose from '101' or '101+GLAM'.")
+            if cnn_arch == "resnet101":
+                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "vgg16":
+                self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            else:
+                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
+            
+
         
         self.lstm = rnn.LSTM(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
         
@@ -120,16 +120,16 @@ if __name__ == "__main__":
     # y= model(x_cnn, x_lstm)
     # print(y.detach().shape)
     
-    print("Testing Resnet...")
+    print("Testing SoilNet...")
     x = torch.randn((32,12,64,64))
-    model = ResNet(cnn_in_channels=12, resnet_architecture="101+GLAM")
+    model = SoilNet(cnn_in_channels=12, resnet_architecture="101+GLAM")
     y = model(x)
     print(y.detach().shape)
     
-    print('Testing ResNetLSTM...')
+    print('Testing SoilNetLSTM...')
     x_cnn = torch.randn((32,12,64,64)).to(device)
     x_lstm = torch.randn((32, 60, 10)).to(device)
-    model = ResNetLSTM(resnet_architecture="101+GLAM", cnn_in_channels= 12, regresor_input_from_cnn=1024,
+    model = SoilNetLSTM(resnet_architecture="101+GLAM", cnn_in_channels= 12, regresor_input_from_cnn=1024,
                        lstm_n_features= 10, lstm_n_layers=2, lstm_out=128, hidden_size=128).to(device)
     y= model((x_cnn, x_lstm))
     print(y.detach().shape)
