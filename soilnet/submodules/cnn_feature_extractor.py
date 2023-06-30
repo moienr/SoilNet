@@ -254,19 +254,7 @@ class ResNet101(nn.Module):
         x = self.relu(x)
         return x
     
-class ResNet101V2(nn.Module):
-    def __init__(self, in_channels=14 ,out_nodes=1024):
-        super().__init__()
-        self.resnet = models.resnet101(weights=None)
-        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=1, padding=3,
-                               bias=False)
-        self.resnet.maxpool = nn.Identity()
-        self.relu = nn.LeakyReLU()
-        self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
-    def forward(self, x):
-        x = self.resnet(x)
-        x = self.relu(x)
-        return x
+    
 
 class ResNet101GLAM(nn.Module):
     """ ### Resnet but with added GLAM layer
@@ -303,44 +291,46 @@ class ResNet101GLAM(nn.Module):
         x = self.relu(x)
         return x
     
-class ResNet101V2GLAM(nn.Module):
-    """ ### Resnet but with added GLAM layer
-    
-    GLAM in the original paper is applied at the end of the resnet 101, at a layer where the feature map is 8x8.
-    But in this case,Since our input is a 64x64 image instead of 256x256, we want to apply it at the end of the first resnet block,
-    so that the feature map is 8x8. This is done by adding a GLAM layer after the first resnet block.
-    """
-    def __init__(self, in_channels=14 ,out_nodes=1024, glam_reduce_channels = 64):
-        """
 
-        Args:
-            in_channels (int, optional): The number of input channels in the image. Defaults to 14.
-            out_nodes (int, optional): The number of output nodes (Dense Layer). Defaults to 1024.
-        """
+  
+  
+class baseVGG16(nn.Module):
+    def __init__(self, in_channels=14, out_nodes=1024):
         super().__init__()
-        self.glam = GLAM(in_channels=2048, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
-        self.resnet = models.resnet101(weights=None)
-        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=1, padding=3,
-                               bias=False)
-        self.resnet.maxpool = nn.Identity() # remove maxpooling
-        self.resnet.layer4 = nn.Sequential(self.resnet.layer4,
-                                           self.glam)
+        self.vgg16 = models.vgg16(weights=None)
+    def forward(self, x):
+        x = self.vgg16(x)
+        return x
     
+class VGG16(nn.Module):
+    def __init__(self, in_channels=14, out_nodes=1024):
+        super().__init__()
+        self.vgg16 = models.vgg16(weights=None)
+        self.vgg16.features[0] = nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1)
         self.relu = nn.LeakyReLU()
-        self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Args:
-            x (torch.Tensor): a batch of images with shape (batch_size, in_channels, image_size, image_size)
-        Returns:
-            torch.Tensor s: a batch of features with shape (batch_size, out_nodes)
-        """
-        x = self.resnet(x)
+        self.vgg16.classifier[6] = nn.Linear(4096, out_nodes)
+        
+    def forward(self, x):
+        x = self.vgg16(x)
         x = self.relu(x)
         return x
+    
+class VGG16GLAM(VGG16):
+    def __init__(self, in_channels=14, out_nodes=1024, glam_reduce_channels = 32):
+        super().__init__(in_channels, out_nodes)
+        self.glam = GLAM(in_channels=512, num_reduced_channels=glam_reduce_channels, feature_map_size=8, kernel_size=5)
+        self.vgg16.features[22] = nn.Sequential(self.vgg16.features[22], self.glam)
+    
 
-  
-  
+    
+    
+    
+    
+#######################################################################################
+######################################## TESTS ########################################
+#######################################################################################
+    
+    
     
 def test_cnn_flattener(ClassToTest=CNNFlattener64, image_size=64):
     """
@@ -363,6 +353,12 @@ def test_resnet101_glam(device="cpu"):
     resnet = ResNet101GLAM().to(device)
     output = resnet(x)
     print(output.shape)
+    
+def test_vgg16(device="cpu"):
+    x = torch.randn((16, 14, 64, 64)).to(device)
+    vgg16 = models.vgg16_bn(weights=None).to(device)
+    output = vgg16(x)
+    print(output.shape)
    
 if __name__ == "__main__": # testing the model
     if torch.cuda.is_available():   
@@ -377,13 +373,19 @@ if __name__ == "__main__": # testing the model
     test_resne101(device=device)
     print("Testing Resnet101+GLAM...")
     test_resnet101_glam(device=device)
-
     
+
+    # print("Summary...")
+    # resnet = ResNet101GLAM().to(device)
+    # from torchinfo import summary
+    # summary(resnet, input_size=(1, 14, 64, 64), device=device,
+    #         col_names=["input_size","kernel_size", "output_size", "num_params"], col_width=20,
+    #         row_settings=["var_names"],depth=5)
     
     print("Summary...")
-    resnet = ResNet101GLAM().to(device)
+    vgg = VGG16GLAM(in_channels=14).to(device)
     from torchinfo import summary
-    summary(resnet, input_size=(1, 14, 64, 64), device=device,
+    summary(vgg, input_size=(1, 14, 64, 64), device=device,
             col_names=["input_size","kernel_size", "output_size", "num_params"], col_width=20,
             row_settings=["var_names"],depth=5)
     
