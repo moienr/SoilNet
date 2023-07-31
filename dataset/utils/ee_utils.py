@@ -34,7 +34,7 @@ import math
 #         print("Maybe try ee.Authenticate() and ee.Initialize() again?")
 
 
-def get_square_roi(lat, lon, roi_size = 1920, return_gee_object = False):
+def get_square_roi(lat, lon, roi_size = ..., return_gee_object = False):
     """
     Returns a square region of interest (ROI) centered at the given latitude and longitude
     coordinates with the specified size. By default, the ROI is returned as a list of
