@@ -43,5 +43,5 @@
 ---
 <!-- ![oc_germany](https://github.com/moienr/SoilNet/blob/da789f2bf2f2df5dacca6b44ea2be63ed516e54f/dataset/oc_histogram.png) -->
 ---
-![oc_all](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/overallarc2.png)
-![SoilNet] (https://github.com/moienr/SoilNet/blob/main/readme_imgs/overallarc2.png)
+<!-- ![oc_all](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/overallarc2.png) -->
+![SoilNet] (./readme_imgs/overallarc2.png)
