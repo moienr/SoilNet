@@ -1,0 +1,20 @@
+{
+    "RMSE": 72.94809327231695,
+    "USE_CLIMATE": false,
+    "USE_SRTM": true,
+    "NUM_ITTERS": 50,
+    "CV": 10,
+    "SEED": 42,
+    "param_dist": "{'n_estimators': [1, 2, 5, 10, 20, 30, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500], 'max_depth': [1, 2, 3, 4, 5, 10], 'min_samples_split': [1, 2, 5, 10], 'min_samples_leaf': [1, 2, 5, 10, 15, 20], 'max_leaf_nodes': [1, 2, 5, 10, 15, 20]}",
+    "BEST_PARAMS": {
+        "n_estimators": 300,
+        "min_samples_split": 5,
+        "min_samples_leaf": 20,
+        "max_leaf_nodes": 20,
+        "max_depth": 10
+    },
+    "TIME": {
+        "start": "2023-05-17 07:31:42",
+        "finish": "2023-05-17 10:39:33"
+    }
+}
