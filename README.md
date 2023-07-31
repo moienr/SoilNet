@@ -43,3 +43,46 @@ This new architecture, incorporates spatial information using a base convolution
 ---
  ![SoilNET](./readme_imgs/overallarc2.png)
 ---
+
+
+# Usage
+
+1. **Prerequisites**:
+   - Install Conda: Make sure you have Conda installed on your system.
+   - Internet Connection: Ensure you have an active internet connection.
+
+2. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/moienr/SoilNet.git
+   ```
+
+3. **Create the Environments**:
+   ```bash
+    cd SoilNet
+    ```
+    3.1. for train:
+    ```bash  
+    conda env create -f requirements/pytorch_reqs.yml
+    ```
+
+    3.2. for dataset:
+    ```bash  
+    conda env create -f requirements/geemap_reqs.yml
+    ```
+
+4. **Activate the Environment**:
+    ```bash
+    conda activate pytorch
+    ```
+    or
+    ```bash
+    conda activate geemap
+    ```
+
+
+5. **Run the Code**:
+
+    ```bash
+    python train.py -nw 4 -tbs 8 -lr 0.0001 -ne 10 -ca resnet101
+    ```
+    Although to train, you're gonna need to have the `.csv` files. namely LUCAS dataset under the handle of `--lucas_csv` and the TerraClimate dataset under the handle of `--climate_csv_folder_path`. 
