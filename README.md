@@ -123,7 +123,7 @@ The `train.py` script accepts several command-line flags (arguments) that allow 
 4. `-lr` or `--learning_rate`:
    - Type: Float
    - Default: 0.0001
-   - Description: Learning rate used for the optimization algorithm during training. A higher learning rate can lead to faster convergence but may require more careful tuning.
+   - Description: Learning rate used for the optimization algorithm during training.
 
 5. `-ne` or `--num_epochs`:
    - Type: Integer
@@ -138,7 +138,7 @@ The `train.py` script accepts several command-line flags (arguments) that allow 
 7. `-oc` or `--oc_max`:
    - Type: Integer
    - Default: 87
-   - Description: Maximum value for OC (Oxford-Clay) during training. Adjust this value based on your specific use case.
+   - Description: Maximum value for OC during training. Adjust this value based on your specific use case.
 
 8. `-us` or `--use_srtm`:
    - Action: Store True
@@ -188,7 +188,7 @@ The `train.py` script accepts several command-line flags (arguments) that allow 
 17. `-lcp` or `--lucas_csv_path`:
     - Type: String
     - Default: 'D:\python\SoilNet\dataset\LUCAS_2015_all.csv'
-    - Description: Path to the LUCAS (Land Use/Cover Area frame Survey) CSV file.
+    - Description: Path to the LUCAS CSV file.
 
 18. `-ccp` or `--climate_csv_folder_path`:
     - Type: String
