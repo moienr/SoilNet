@@ -342,7 +342,7 @@ class NormalizeClimDF:
 #############################################################################################################   
 
 if __name__ == "__main__":
-    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv')
+    ds = SNDataset(...,...)
     print(len(ds))
     x = ds[0]
     print('OC: ', x[1], type(x[1]))
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     mynorm = myNormalize()
     my_to_tensor = myToTensor()
     transform = transforms.Compose([mynorm, my_to_tensor])
-    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv',transform=transform)
+    ds = SNDataset(...,...,transform=transform)
     rand = np.random.randint(0,len(ds))
     x = ds[rand]
     print('OC: ', x[1], type(x[1]))
@@ -399,9 +399,9 @@ if __name__ == "__main__":
     
     
     print("Testing SNDatasetClimate...")
-    ds = SNDatasetClimate('D:\\python\\SoilNet\\dataset\\l8_images\\train\\',
-                          'D:\\python\\SoilNet\\dataset\\LUCAS_2015_all.csv',
-                          "D:\\python\\SoilNet\\dataset\\Climate\\All\\filled", transform=transform)
+    ds = SNDatasetClimate(...,
+                          ...,
+                          ..., transform=transform)
     rand = np.random.randint(0,len(ds))
     x = ds[rand]
     print('OC: ', x[1], type(x[1]))
