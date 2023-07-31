@@ -1,5 +1,6 @@
 # SoilNet
 A Spatio-temporal framework for a Soil property prediction with digital Soil Mapping 
+
 <!-- ## Experiments
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
@@ -23,11 +24,11 @@ A Spatio-temporal framework for a Soil property prediction with digital Soil Map
 - ~~FCNN + SA + Regressor~~
 - ~~LSTM~~
  -->
+ 
 <!-- ### DATASET
 - ~~Add TerraClimate Dataset~~
 - ~~Update the ClimateInformation.js (in processing)~~
 - ~~Write SRTM + Slope dataset donwlaoder~~ 
-
  ### Analysis
 - CNN
 - CNN + Att 
