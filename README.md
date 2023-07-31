@@ -72,20 +72,24 @@ This new architecture, incorporates spatial information using a base convolution
 4. **Activate the Environment**:
 
     4.1. for train:
-        ```bash
-        conda activate pytorch
-        ```
+
+    ```bash
+    conda activate pytorch
+    ```
 
     4.2. to download the dataset:
-        ```bash
-        conda activate geemap
-        ```
+
+    ```bash
+    conda activate geemap
+    ```
 
 
 5. **Run the Code**:
 
+    Flags are explained in the next section.
+
     ```bash
-    python train.py -nw 4 -tbs 8 -lr 0.0001 -ne 10 -ca resnet101
+    python train.py -ne 100 -tbs 8 -ne 10 -ca resnet101
     ```
     
     Although to train, you're gonna need to have the `.csv` files. namely LUCAS dataset under the flag of `--lucas_csv` and the TerraClimate dataset under the flag of `--climate_csv_folder_path`. 
