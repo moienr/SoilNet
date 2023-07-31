@@ -38,6 +38,6 @@
 
 ---
 <!-- ![oc_all](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/overallarc2.png) -->
+---
 <!-- ![SoilNET](./readme_imgs/overallarc2.png) -->
-
 ---
