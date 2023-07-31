@@ -1,6 +1,5 @@
 # SoilNet
-
-
+A Spatio-temporal framework for a Soil property prediction with digital Soil Mapping 
 <!-- ## Experiments
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
@@ -27,14 +26,14 @@
 <!-- ### DATASET
 - ~~Add TerraClimate Dataset~~
 - ~~Update the ClimateInformation.js (in processing)~~
-- ~~Write SRTM + Slope dataset donwlaoder~~ -->
+- ~~Write SRTM + Slope dataset donwlaoder~~ 
 
  ### Analysis
 - CNN
 - CNN + Att 
 - CNN + Att + LSTM
 - RF with no timeseries data
-- RF + timeseries data 
+- RF + timeseries data -->
 
 ---
 <!-- ![oc_all](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/overallarc2.png) -->
