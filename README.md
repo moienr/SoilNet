@@ -3,6 +3,8 @@ A Spatio-temporal Framework for Soil Property Prediction with Digital Soil Mappi
 
 This new architecture, incorporates spatial information using a base convolutional neural network (CNN) model and spatial attention mechanism, along with climate temporal information using a long short-term memory (LSTM) network. 
 
+In case you need more information, feel free to send an email: nafiseh.kakhani@uni-tuebingen.de
+
 <!-- ## Experiments
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
