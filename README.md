@@ -47,6 +47,8 @@ This new architecture, incorporates spatial information using a base convolution
 
 # Usage
 
+## Installation
+
 1. **Prerequisites**:
    - Install Conda: Make sure you have Conda installed on your system.
 
@@ -59,7 +61,7 @@ This new architecture, incorporates spatial information using a base convolution
    ```bash
     cd SoilNet
     ```
-    3.1. for train:
+    3.1. for training:
     ```bash  
     conda env create -f requirements/pytorch_reqs.yml
     ```
@@ -83,6 +85,7 @@ This new architecture, incorporates spatial information using a base convolution
     conda activate geemap
     ```
 
+## Training
 
 5. **Run the Code**:
 
@@ -92,8 +95,9 @@ This new architecture, incorporates spatial information using a base convolution
     python train.py -ne 100 -tbs 8 -ne 10 -ca resnet101
     ```
     
-    Although to train, you're gonna need to have the `.csv` files. namely LUCAS dataset under the flag of `--lucas_csv` and the TerraClimate dataset under the flag of `--climate_csv_folder_path`. 
+    Although to train, you're gonna need to have the `.csv` files. namely LUCAS dataset under the flag of `--lucas_csv` and the TerraClimate dataset under the flag of `--climate_csv_folder_path`.
 
+The output is a **Training Plot and** a **JSON** file containing all of the results of the **cross-validation**. all will be saved in the `results/` folder
 
 
 
