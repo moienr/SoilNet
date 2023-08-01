@@ -104,7 +104,7 @@ The output is a **Training Plot and** a **JSON** file containing all of the resu
 
 
 
-
+<!--
 ## Explanation of Command-line Flags for `train.py`
 
 The `train.py` script accepts several command-line flags (arguments) that allow you to customize the training process. These flags help adjust various settings and parameters for the model training. Below is a detailed explanation of each flag:
@@ -200,3 +200,4 @@ The `train.py` script accepts several command-line flags (arguments) that allow 
     - Description: Path to the climate CSV folder.
 
 These command-line flags allow you to configure various aspects of the model training process based on your specific requirements and dataset. Adjust the values according to your needs when running the `train.py` script.
+-->
