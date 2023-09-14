@@ -7,6 +7,8 @@ In case you need more information, feel free to send an email: nafiseh.kakhani@u
 
 More information: https://arxiv.org/abs/2308.03586
 
+To access LUCAS topsoil dataset: https://esdac.jrc.ec.europa.eu/content/topsoil-physical-properties-europe-based-lucas-topsoil-data
+
 <!-- ## Experiments
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
