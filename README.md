@@ -5,6 +5,8 @@ This new architecture, incorporates spatial information using a base convolution
 
 In case you need more information, feel free to send an email: nafiseh.kakhani@uni-tuebingen.de
 
+More information: https://arxiv.org/abs/2308.03586
+
 <!-- ## Experiments
 
 | USE_SA | USE_LSTM | USE_SRTM | OC_MAX | **RUN NAME** |
