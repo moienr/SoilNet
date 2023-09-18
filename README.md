@@ -5,7 +5,7 @@ This new architecture, incorporates spatial information using a base convolution
 
 In case you need more information, feel free to send an email: nafiseh.kakhani@uni-tuebingen.de
 
-More information: https://arxiv.org/abs/2308.03586
+Paper: https://arxiv.org/abs/2308.03586
 
 To access LUCAS topsoil dataset: https://esdac.jrc.ec.europa.eu/content/topsoil-physical-properties-europe-based-lucas-topsoil-data
 
