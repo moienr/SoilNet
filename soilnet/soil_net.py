@@ -6,6 +6,7 @@ from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128,\
 from submodules.regressor import Regressor, MultiHeadRegressor
 from submodules import rnn
 from typing import Tuple
+from submodules.src.transformer.transformer import TSTransformerEncoderClassiregressor
 
 class SoilNet(nn.Module):
     def __init__(self, use_glam = False , cnn_arch = "resnet101", reg_version = 1,
@@ -48,7 +49,7 @@ class SoilNet(nn.Module):
 class SoilNetLSTM(nn.Module):
     def __init__(self, use_glam = False  , cnn_arch = "resnet101", reg_version = 1,
                  cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, 
-                 lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128):
+                 lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128, rnn_arch = "LSTM", seq_len = 60):
         
         super().__init__()
         
@@ -69,8 +70,29 @@ class SoilNetLSTM(nn.Module):
                 raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
             
 
-        
-        self.lstm = rnn.LSTM(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
+        if rnn_arch == "LSTM":
+            self.lstm = rnn.LSTM(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
+        elif rnn_arch == "GRU":
+            self.lstm = rnn.GRU(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
+        elif rnn_arch == "RNN":
+            self.lstm = rnn.RNN(lstm_n_features, hidden_size, lstm_n_layers, lstm_out)
+        elif rnn_arch == "Transformer":
+            self.lstm = TSTransformerEncoderClassiregressor(
+                        feat_dim=lstm_n_features,
+                        max_len=seq_len,
+                        d_model=512,
+                        n_heads=8,
+                        num_layers=6,
+                        dim_feedforward=2048, 
+                        num_classes=lstm_out,
+                        dropout=0.1,
+                        pos_encoding="fixed",
+                        activation="gelu",
+                        norm="BatchNorm",
+                        freeze=False,
+                        )
+        else:
+            raise ValueError("Invalid RNN Architecture. Please choose from 'LSTM', 'GRU' or 'RNN'.")
         
         self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size, version=reg_version)
         
