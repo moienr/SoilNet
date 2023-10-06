@@ -3,6 +3,7 @@ import torch.nn as nn
 from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128,\
                                                 ResNet101, ResNet101GLAM,\
                                                     VGG16, VGG16GLAM
+from submodules.vit import VisionTransformer as ViT
 from submodules.regressor import Regressor, MultiHeadRegressor
 from submodules import rnn
 from typing import Tuple
@@ -10,23 +11,27 @@ from submodules.src.transformer.transformer import TSTransformerEncoderClassireg
 
 class SoilNet(nn.Module):
     def __init__(self, use_glam = False , cnn_arch = "resnet101", reg_version = 1,
-                 cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, hidden_size=128):
+                 cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, hidden_size=128, img_size = 64):
         super().__init__()
         if use_glam:
             if cnn_arch == "resnet101":
                 self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "ViT":
+                raise ValueError("ViT is not supported when GLAM is enabled. Please choose from 'resnet' or 'vgg16' or disable GLAM.")
             else:
-                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
+                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16' or 'ViT'.")
 
         else:
             if cnn_arch == "resnet101":
                 self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "ViT":
+                self.cnn = ViT(img_size=img_size, patch_size=8, in_chans=cnn_in_channels, n_classes=regresor_input_from_cnn, p=0.1, attn_p=0.1)
             else:
-                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
+                raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16' or 'ViT'.")
             
 
         
@@ -49,7 +54,7 @@ class SoilNet(nn.Module):
 class SoilNetLSTM(nn.Module):
     def __init__(self, use_glam = False  , cnn_arch = "resnet101", reg_version = 1,
                  cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, 
-                 lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128, rnn_arch = "LSTM", seq_len = 60):
+                 lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128, rnn_arch = "LSTM", seq_len = 61, img_size = 64):
         
         super().__init__()
         
@@ -58,6 +63,8 @@ class SoilNetLSTM(nn.Module):
                 self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "ViT":
+                raise ValueError("ViT is not supported when GLAM is enabled. Please choose from 'resnet' or 'vgg16' or disable GLAM.")
             else:
                 raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
 
@@ -66,6 +73,8 @@ class SoilNetLSTM(nn.Module):
                 self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "ViT":
+                self.cnn = ViT(img_size=img_size, patch_size=8, in_chans=cnn_in_channels, n_classes=regresor_input_from_cnn, p=0.1, attn_p=0.1)
             else:
                 raise ValueError("Invalid CNN Architecture. Please choose from 'resnet' or 'vgg16'.")
             
