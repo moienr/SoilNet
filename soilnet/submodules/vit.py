@@ -31,6 +31,9 @@ class PatchEmbed(nn.Module):
     def __init__(self, img_size, patch_size, in_chans=3, embed_dim=768):
         super().__init__()
         self.img_size = img_size
+        if img_size % patch_size != 0:
+            raise ValueError("img_size must be divisible by patch_size")
+        
         self.patch_size = patch_size
         self.n_patches = (img_size // patch_size) ** 2
 
@@ -55,11 +58,9 @@ class PatchEmbed(nn.Module):
         torch.Tensor
             Shape `(n_samples, n_patches, embed_dim)`.
         """
-        x = self.proj(
-                x
-            )  # (n_samples, embed_dim, n_patches ** 0.5, n_patches ** 0.5)
-        x = x.flatten(2)  # (n_samples, embed_dim, n_patches)
-        x = x.transpose(1, 2)  # (n_samples, n_patches, embed_dim)
+        x = self.proj(x)  # -> (n_samples, embed_dim, n_patches ** 0.5, n_patches ** 0.5)
+        x = x.flatten(2)  # the smae as using x.flatten(2, 3) -> (n_samples, embed_dim, n_patches)
+        x = x.transpose(1, 2)  # -> (n_samples, n_patches, embed_dim)
 
         return x
 
@@ -129,7 +130,7 @@ class Attention(nn.Module):
 
         if dim != self.dim:
             raise ValueError
-
+        # linear layer only applied to the last dimension. so n_samples and n_patches(tokens) + 1 are not affected
         qkv = self.qkv(x)  # (n_samples, n_patches + 1, 3 * dim)
         qkv = qkv.reshape(
                 n_samples, n_tokens, 3, self.n_heads, self.head_dim
@@ -137,13 +138,25 @@ class Attention(nn.Module):
         qkv = qkv.permute(
                 2, 0, 3, 1, 4
         )  # (3, n_samples, n_heads, n_patches + 1, head_dim)
-
+        # with new shape, we can easily get q, k, v without nested indexing.
         q, k, v = qkv[0], qkv[1], qkv[2]
         k_t = k.transpose(-2, -1)  # (n_samples, n_heads, head_dim, n_patches + 1)
         dp = (
            q @ k_t
         ) * self.scale # (n_samples, n_heads, n_patches + 1, n_patches + 1)
         attn = dp.softmax(dim=-1)  # (n_samples, n_heads, n_patches + 1, n_patches + 1)
+        # Why softmax on the last dimension? -> softmax on the last dimension means that
+        # we are applying softmax to each row of the matrix. (Remmber self-attention table)
+        # Example: self attention for "I Love You"
+        
+        #   | I   | Love  | You |
+        # I | 0.7 |  0.2  | 0.1 |
+        # L | 0.0 |  0.7  | 0.3 |
+        # Y | 0.0 |  0.0  | 1   |
+    
+        # softmax on the last dimension means that we are applying softmax to each row of the matrix. Creating a probability distribution for each row.
+        # but instead of words, we have patches that are parts of the image.
+        
         attn = self.attn_drop(attn)
 
         weighted_avg = attn @ v  # (n_samples, n_heads, n_patches +1, head_dim)
@@ -424,3 +437,14 @@ class VisionTransformer(nn.Module):
         x = self.head(cls_token_final)
 
         return x
+
+
+import torch
+
+if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using {device}...")
+    model = VisionTransformer(img_size=64, patch_size=8, in_chans=12, n_classes=128, p=0.1, attn_p=0.1).to(device)
+    x = torch.randn(8, 12, 64, 64).to(device)
+    y = model(x)
+    print(y.shape)
