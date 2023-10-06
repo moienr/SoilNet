@@ -1,6 +1,7 @@
-
+import os
 import sys
-sys.path.append('D:\\python\\SoilNet-PreRelease\\soilnet\\submodules\\')
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_dir, '..', '..'))
 
 
 from src.transformer.encoder import TransformerBatchNormEncoderLayer
@@ -199,7 +200,7 @@ class TSTransformerEncoderClassiregressor(nn.Module):
         # add F.log_softmax and use NLLoss
         return output_layer
 
-    def forward(self, X: Tensor, padding_masks: Tensor) -> Tensor:
+    def forward(self, X: Tensor, padding_masks: Tensor = None) -> Tensor:
         """
         Args:
             X: (batch_size, seq_length, feat_dim) torch tensor of masked features (input)
@@ -207,6 +208,8 @@ class TSTransformerEncoderClassiregressor(nn.Module):
         Returns:
             output: (batch_size, num_classes)
         """
+        if padding_masks == None:
+            padding_masks = torch.ones(X.shape[0], X.shape[1]).bool().to(X.device)
 
         # permute because pytorch convention for transformers is [seq_length, batch_size, feat_dim]. padding_masks [batch_size, feat_dim]
         inp = X.permute(1, 0, 2)
@@ -236,16 +239,16 @@ class TSTransformerEncoderClassiregressor(nn.Module):
 print("__name__:", __name__)
 if __name__ == "__main__":
     print("Testing TSTransformerEncoderClassiregressor...")
-    x = torch.rand(2, 3, 4)
+    x = torch.rand(2, 3, 4) # (batch_size, seq_length, feat_dim)
     padding_masks = torch.tensor([[True,True, True], [True, True, True]])
     model = TSTransformerEncoderClassiregressor(
         feat_dim=4,
-        max_len=3,
+        max_len= x.shape[1],
         d_model=4,
         n_heads=2,
         num_layers=2,
         dim_feedforward=8,
-        num_classes=2,
+        num_classes=1,
         dropout=0.1,
         pos_encoding="fixed",
         activation="gelu",
