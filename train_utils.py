@@ -8,7 +8,7 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import os
 from torchmetrics import R2Score
-
+import torch.nn.functional as F
 
 class RMSELoss(nn.Module):
     def __init__(self):
@@ -63,6 +63,47 @@ class R2Loss(nn.Module):
         """
         ones = torch.ones_like(y)
         return 1 - (self.mse(yhat,y)/self.mse(y,ones*y.mean()))
+    
+# SimCLR loss for contrastive learning -> SimCLR paper: https://arxiv.org/pdf/2002.05709.pdf   
+class SimCLR(nn.Module):
+    def __init__(self, temperature):
+        super().__init__()
+        assert temperature > 0.0, "The temperature must be a positive float!"
+        self.temperature = temperature
+
+    def forward(self, feats1, feats2):
+        # Concatenate two batches of features
+        feats = torch.cat([feats1, feats2], dim=0)
+
+        # Calculate cosine similarity
+        cos_sim = F.cosine_similarity(feats[:, None, :], feats[None, :, :], dim=-1)
+        
+        # Mask out cosine similarity to itself
+        self_mask = torch.eye(cos_sim.shape[0], dtype=torch.bool, device=cos_sim.device)
+        cos_sim.masked_fill_(self_mask, -9e15)
+        
+        # Find positive example -> batch_size//2 away from the original example
+        pos_mask = self_mask.roll(shifts=cos_sim.shape[0] // 2, dims=0)
+        
+        # InfoNCE loss
+        cos_sim = cos_sim / self.temperature
+        nll = -cos_sim[pos_mask] + torch.logsumexp(cos_sim, dim=-1)
+        nll = nll.mean()
+
+        # Get ranking position of positive example
+        comb_sim = torch.cat(
+            [cos_sim[pos_mask][:, None], cos_sim.masked_fill(pos_mask, -9e15)],  # First position positive example
+            dim=-1,
+        )
+        sim_argsort = comb_sim.argsort(dim=-1, descending=True).argmin(dim=-1)
+        
+        # Ranking metrics
+        acc_top1 = (sim_argsort == 0).float().mean()
+        acc_top5 = (sim_argsort < 5).float().mean()
+        acc_mean_pos = 1 + sim_argsort.float().mean()
+        
+        return nll, acc_top1, acc_top5, acc_mean_pos    
+    
 
 def train_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, optimizer:torch.optim.Optimizer):
     model.train()
@@ -306,3 +347,28 @@ class BatchLoader(torch.utils.data.Dataset):
             if i == index:
                 return batch
         raise IndexError("Index out of range")
+    
+def test_SimCLR():
+    from torch.distributions import uniform
+    # Create instance of SimCLR model
+    model = SimCLR(temperature=0.5)
+
+    # Generate dummy features with uniform distribution
+    dummy_feats1 = uniform.Uniform(0, 1).rsample((64, 128)) # 64 samples, 128 features
+    dummy_feats2 = uniform.Uniform(0, 1).rsample((64, 128))
+
+    # Forward pass
+    nll, acc_top1, acc_top5, acc_mean_pos = model(dummy_feats1, dummy_feats2)
+
+    # Validate outputs
+    assert isinstance(nll, torch.Tensor)
+    assert isinstance(acc_top1, torch.Tensor)
+    assert isinstance(acc_top5, torch.Tensor)
+    assert isinstance(acc_mean_pos, torch.Tensor)
+
+    print("nll: ", nll, "\n", "acc_top1: ", acc_top1, "\n", "acc_top5: ", acc_top5, "\n", "acc_mean_pos: ", acc_mean_pos)
+    # Print test passed
+    print("Test passed!")
+        
+if __name__ == "__main__":
+    test_SimCLR()
