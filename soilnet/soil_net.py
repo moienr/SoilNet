@@ -177,7 +177,7 @@ class SoilNetSimCLR(nn.Module):
         else:
             raise ValueError("Invalid RNN Architecture. Please choose from 'LSTM', 'GRU' or 'RNN'.")
         
-        self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size, version=reg_version)
+        #self.reg = MultiHeadRegressor(regresor_input_from_cnn, lstm_out, hidden_size= hidden_size, version=reg_version)
         
     def forward(self, input_raster_ts: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
         """
@@ -189,7 +189,8 @@ class SoilNetSimCLR(nn.Module):
             
         Outputs
         -------
-            - output (torch.Tensor): A tensor of shape `(batch_size, 1)` representing the predicted output of regression.
+            - output (torch.Tensor, torch.Tensor): A tupples of tensors of shape `(batch_size, 128)` representing the embeddings of image and climate data.
+            to be used in SimCLR loss.
         """
         raster_stack, ts_features = input_raster_ts
         flat_raster = self.cnn(raster_stack)
