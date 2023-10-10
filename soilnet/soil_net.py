@@ -127,7 +127,7 @@ class SoilNetLSTM(nn.Module):
 
 class SoilNetSimCLR(nn.Module):
     def __init__(self, use_glam = False  , cnn_arch = "resnet101", reg_version = 1,
-                 cnn_in_channels = 14 ,regresor_input_from_cnn = 1024, 
+                 cnn_in_channels = 14 ,regresor_input_from_cnn = 128, 
                  lstm_n_features = 10,lstm_n_layers =2, lstm_out = 128, hidden_size=128, rnn_arch = "LSTM", seq_len = 61, img_size = 64):
         
         super().__init__()
@@ -199,7 +199,27 @@ class SoilNetSimCLR(nn.Module):
         return flat_raster, lstm_output
                 
     
-    
+class SoilNetSimCLRwRegHead(nn.Module):
+    def __init__(self, soilnet_simclr: SoilNetSimCLR, hidden_size=128, reg_version = 1):
+        super().__init__()
+        self.soilnet_simclr = soilnet_simclr
+        self.reg = MultiHeadRegressor(hidden_size, hidden_size, hidden_size= hidden_size, version=reg_version)
+    def forward(self, input_raster_ts: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
+        """
+        Inputs
+        ------
+        input_raster_ts : A tupple containing the following two tensors:
+            * raster_stack (torch.Tensor): A 4D tensor of shape `(batch_size, channels, height, width)` representing a stack of raster images.
+            * ts_features (torch.Tensor): A 3D tensor of shape `(batch_size, seq_length, , n_features)` representing a sequence of time-series features. | `seq_length` is the number of time steps in the sequence. e.g. months in our climate data
+            
+        Outputs
+        -------
+            - output (torch.Tensor): A tensor of shape `(batch_size, 1)` representing the predicted output of regression.
+        """
+        raster_stack, ts_features = input_raster_ts
+        flat_raster, lstm_output = self.soilnet_simclr((raster_stack, ts_features))
+        output = self.reg(flat_raster, lstm_output)
+        return output
     
     
 if __name__ == "__main__":
