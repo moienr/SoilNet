@@ -1,30 +1,38 @@
-""" A collection of utility functions for working with Earth Engine (EE) in Python.
-
-    Functions
-    ---------
-    ### `get_square_roi` :
-        returns a square region of interest (ROI) centered at the given latitude and longitude coordinates with the specified size.
-    ### `get_cloud_mask` : 
-        Takes an ee.Image and returns the cloud, cloud shadow and  cloud_or_cloudShadow mask
-    ### `get_snow_mask` : 
-        Takes an ee.Image and returns the snow mask
-    ### `get_mean_ndvi` :
-        Takes an ee.Image and returns the mean NDVI value of the image
-    ### `get_mask_ones_ratio` : 
-        Takes a  01 mask as an ee.Image and returns the ratio of ones in the mask
-    ### `get_not_nulls_ratio` : 
-        Takes an ee.Image and returns the ratio of pixels that are not null in the image.
-    ### `add_mineral_indices` : 
-        Takes an ee.Image and adds the following mineral indices to it as it bands: clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex
-    ### `get_closest_image` : 
-        Takes an ee.ImageCollection and a date and returns the image in the collection that is closest to the given date.
-    ### `radiometric_correction`: 
-        Takes an ee.Image and returns the radiometrically corrected image. (only the Reflectance bands will change)
 """
+A collection of utility functions for working with Earth Engine (EE) in Python.
+
+Functions
+---------
+`get_square_roi` :
+    Returns a square region of interest (ROI) centered at the given latitude and longitude coordinates with the specified size.
+`get_cloud_mask` : 
+    Takes an ee.Image and returns the cloud, cloud shadow and  cloud_or_cloudShadow mask.
+`get_snow_mask` : 
+    Takes an ee.Image and returns the snow mask.
+`get_mean_ndvi` :
+    Takes an ee.Image and returns the mean NDVI value of the image.
+`get_mask_ones_ratio` : 
+    Takes a  01 mask as an ee.Image and returns the ratio of ones in the mask.
+`get_not_nulls_ratio` : 
+    Takes an ee.Image and returns the ratio of pixels that are not null in the image.
+`add_mineral_indices` : 
+    Takes an ee.Image and adds the following mineral indices to it as it bands: clayIndex, ferrousIndex, carbonateIndex, rockOutcropIndex.
+`get_closest_image` : 
+    Takes an ee.ImageCollection and a date and returns the image in the collection that is closest to the given date.
+`radiometric_correction`:
+    Takes an ee.Image and returns the radiometrically corrected image. (only the Reflectance bands will change).
+`random_point_csv_generator`: 
+    Generates a csv file with random points in a given bounding region of interest.
+`calculate_land_cover_percentage`:
+    Calculates the percentage of pixels in the given image that have the specified values within the region of interest (ROI).
+
+"""
+
 
 import ee
 import geemap
 import math 
+import pandas as pd
 
 # if __name__ != '__main__':
 #     try:
@@ -327,3 +335,62 @@ def radiometric_correction(image: ee.Image , sr_bands_list = ['SR_B1','SR_B2','S
     sr_bands = image.select(sr_bands_list).multiply(2.75e-05).add(-0.2)
     image = image.addBands(sr_bands, None, True)
     return image
+
+
+def random_point_csv_generator(bounding_roi, num_points=1000, file_name="random_points", start_id=10000000, seed=0):
+    """
+    Generates a csv file with random points in a given bounding region of interest.
+    Args:
+        bounding_roi (ee.Geometry): Region of interest to generate random points in. 
+        num_points (int): Number of random points to generate.
+        file_name (str): Name of the csv file to save the random points in.
+        start_id (int): The starting id of the random points. This is to make the point_id an 8 digit number, same as LUCAS dataset.
+        
+    Returns:
+        df (pandas.DataFrame): A dataframe with the random points and their coordinates.
+    """
+    # Create a random set of points in the region of interest
+    points = ee.FeatureCollection.randomPoints(region=bounding_roi, points=num_points, seed=seed).getInfo()
+    
+    df = pd.DataFrame(columns=['Point_ID', 'long', 'lat','OC'])
+
+    # loop through the features of the randomPoints object to populate the dataframe
+    for i, point in enumerate(points['features']):
+        lon = point['geometry']['coordinates'][0]
+        lat = point['geometry']['coordinates'][1]
+        
+        df.loc[i] = [i+start_id, lon, lat, 0] # the start_id is to make it a 8 digit number, same as LUCAS dataset.
+
+    # convert point_id column to integer type
+    df['Point_ID'] = df['Point_ID'].astype(int)
+    
+    # save the dataframe as a csv file
+    df.to_csv(file_name + ".csv", index=True, index_label='OID_')
+
+    return df   
+
+
+def calculate_land_cover_percentage(image, values, roi,scale=30):
+    """
+    Calculates the percentage of pixels in the given image that have the specified values within the ROI.
+
+    Args:
+    image (ee.Image): The image to calculate the percentage for.
+    values (list): A list of values to calculate the percentage for. Check https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v100 for the values.
+    scale (int, optional): The scale of the reduction. Defaults to 30. The larger the scale, the faster the calculation, but the less accurate it is.
+    roi (ee.Geometry, optional): The region of interest. Defaults to roi.
+
+    Returns:
+    float: The percentage of pixels in the image that have the specified values within the ROI.
+    """
+    # calculate the total number of pixels
+    total_pixels = image.select('Map').reduceRegion(reducer=ee.Reducer.count(), geometry=roi, scale=scale).get('Map')
+    value_pixels = ee.Number(0)
+    for value in values:   
+        value_p =  ee.Number(image.select('Map').eq(value).reduceRegion(reducer=ee.Reducer.sum(), geometry=roi, scale=scale).get('Map'))
+        value_pixels = value_pixels.add(value_p)
+    
+    # calculate the percentage of pixels with the given value
+    percentage = value_pixels.divide(total_pixels).multiply(100)
+    
+    return percentage
