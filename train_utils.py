@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 import os
 from torchmetrics import R2Score
 
+import pandas as pd
+import numpy as np
+from sklearn.metrics import mean_squared_error, r2_score
+
 class RMSELoss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -336,3 +340,59 @@ class BatchLoader(torch.utils.data.Dataset):
                 return batch
         raise IndexError("Index out of range")
     
+
+
+
+def evaluate_regression_metrics(y_true, y_pred):
+    """Calculate multiple regression evaluation metrics."""
+    # y_true = y_true * 87  # Multiply y_true by 87
+    # y_pred = y_pred * 87  # Multiply y_pred by 87
+    
+    # Calculate RMSE (Root Mean Squared Error)
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    
+    # Calculate R2 (R-squared)
+    r2 = r2_score(y_true, y_pred)
+    
+    # Calculate RPIQ (Relative Prediction Interval Quality)
+    y_std = np.std(y_true)
+    rpiq = 1 - (rmse / y_std)
+    
+    # Calculate MAE (Mean Absolute Error)
+    mae = np.mean(np.abs(y_true - y_pred))
+    
+    # Calculate MEC (Mean Error Correction)
+    mec = np.mean(y_true - y_pred)
+    
+    # Calculate CCC (Concordance Correlation Coefficient)
+    def concordance_correlation_coefficient(y_real, y_pred):
+        # Raw data
+        dct = {
+            'y_real': y_real,
+            'y_pred': y_pred
+        }
+        df = pd.DataFrame(dct)
+        # Remove NaNs
+        df = df.dropna()
+        # Pearson product-moment correlation coefficients
+        y_real = df['y_real']
+        y_pred = df['y_pred']
+        cor = np.corrcoef(y_real, y_pred)[0][1]
+        # Means
+        mean_real = np.mean(y_real)
+        mean_pred = np.mean(y_pred)
+        # Population variances
+        var_real = np.var(y_real)
+        var_pred = np.var(y_pred)
+        # Population standard deviations
+        sd_real = np.std(y_real)
+        sd_pred = np.std(y_pred)
+        # Calculate CCC
+        numerator = 2 * cor * sd_real * sd_pred
+        denominator = var_real + var_pred + (mean_real - mean_pred)**2
+
+        return numerator / denominator
+    
+    ccc = concordance_correlation_coefficient(y_true, y_pred)
+    
+    return rmse, r2, rpiq, mae, mec, ccc
