@@ -233,6 +233,7 @@ def train(model: torch.nn.Module,
           lr_scheduler: bool = None,
           save_model_path = None,
           save_model_if_mae_lower_than = None,
+          save_train_data_metrics = False
           ):
     """ Train the model and test it on the test set
     Note: If you don't have diffrent validation and test sets, just pass the same dataloader for both test and val
@@ -262,7 +263,10 @@ def train(model: torch.nn.Module,
                "val_loss": [],
                "MAE": [],
                "RMSE": [],
-               "R2": []
+               "R2": [],
+               "train_MAE": [],
+                "train_RMSE": [],
+                "train_R2": []
     }
     
     # 3. Loop through training and testing steps for a number of epochs
@@ -298,6 +302,10 @@ def train(model: torch.nn.Module,
     results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False))
     results["RMSE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=RMSELoss(), verbose=False))
     results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score().to(device), verbose=False)) 
+    if save_train_data_metrics:
+        results["train_MAE"].append(test_step(model=model, data_loader=train_dataloader, loss_fn=nn.L1Loss(), verbose=False))
+        results["train_RMSE"].append(test_step(model=model, data_loader=train_dataloader, loss_fn=RMSELoss(), verbose=False))
+        results["train_R2"].append(test_step(model=model, data_loader=train_dataloader, loss_fn=R2Score().to(device), verbose=False))
     # Save the model
     if save_model_path:
         if save_model_if_mae_lower_than:
