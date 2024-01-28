@@ -64,6 +64,35 @@ class R2Loss(nn.Module):
         return 1 - (self.mse(yhat,y)/self.mse(y,ones*y.mean()))
     
 
+class RMSLELoss(nn.Module):
+    def __init__(self):
+        super(RMSLELoss, self).__init__()
+
+    def forward(self, predictions, actuals):
+        """
+        Compute the Root Mean Squared Logarithmic Error.
+        
+        Args:
+            predictions (torch.Tensor): The predicted values.
+            actuals (torch.Tensor): The actual values.
+        
+        Returns:
+            torch.Tensor: The computed RMSLE value.
+        """
+        # Ensure predictions are greater than -1, as log(0) and negative values are undefined
+        predictions = torch.clamp(predictions, min=-1 + 1e-9)
+        actuals = torch.clamp(actuals, min=-1 + 1e-9)
+
+        # Calculate the log loss
+        log_diff = torch.log(predictions + 1) - torch.log(actuals + 1)
+        squared_log_diff = torch.square(log_diff)
+
+        # Return the square root of the mean of squared log differences
+        return torch.sqrt(torch.mean(squared_log_diff))
+
+
+    
+
 def train_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, optimizer:torch.optim.Optimizer):
     model.train()
     # Setup train loss and train accuracy values
