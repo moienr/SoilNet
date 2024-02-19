@@ -50,10 +50,10 @@ To access LUCAS topsoil dataset: https://esdac.jrc.ec.europa.eu/content/topsoil-
  ![SoilNET](./readme_imgs/overallarc2.png)
 ---
 
-
+<!-- ### 
 # Usage
 
-<!-- ### MODEL
+
 ## Installation
 
 1. **Prerequisites**:
