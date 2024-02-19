@@ -53,6 +53,7 @@ To access LUCAS topsoil dataset: https://esdac.jrc.ec.europa.eu/content/topsoil-
 
 # Usage
 
+<!-- ### MODEL
 ## Installation
 
 1. **Prerequisites**:
@@ -105,7 +106,7 @@ To access LUCAS topsoil dataset: https://esdac.jrc.ec.europa.eu/content/topsoil-
 
 The output is a **Training Plot and** a **JSON** file containing all of the results of the **cross-validation**. all will be saved in the `results/` folder
 
-
+-->
 
 
 
