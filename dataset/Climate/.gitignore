@@ -1,1 +1,4 @@
 *.csv
+RaCA/*
+RaCA_SimCLR_all/*
+RaCA_SimCLR/*
