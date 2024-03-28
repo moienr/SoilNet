@@ -7,7 +7,7 @@ from torchvision import datasets, transforms
 import pandas as pd
 import torch.nn.functional as F
 
-from utils.utils import reshape_tensor, reshape_array, get_df_max_min, normalize
+from utils.utils import reshape_tensor, reshape_array, get_df_max_min, normalize, log_transform
 
 class SNDataset(Dataset):
   def __init__(self, l8_dir, csv_dir , l8_bands: list = None ,transform = None, return_point_id = False):
@@ -110,10 +110,14 @@ class SNDatasetClimate(Dataset):
 
     point_id = l8_img_name.split('_')[0]
     
-    row = self.df[self.df['Point_ID'] == int(point_id)]
+    row = self.df[self.df['Point_ID'] == int(point_id)] # LUCAS
+    # row = self.df[self.df['Point_ID'] == (point_id)] # RaCA
+
     oc = row['OC'].values[0]
     
-    self.clim_dfs_row = [df[df['Point_ID'] == int(point_id)] for df in self.clim_dfs]
+    self.clim_dfs_row = [df[df['Point_ID'] == int(point_id)] for df in self.clim_dfs] # LUCAS
+    # self.clim_dfs_row = [df[df['Point_ID'] == (point_id)] for df in self.clim_dfs] # RaCA
+
     self.clim_dfs_row = [df[self.dates] for df in self.clim_dfs_row]
     clim_arr = np.stack([df.values.squeeze() for df in self.clim_dfs_row], axis=1)
 
@@ -186,17 +190,20 @@ class myNormalize:
           img[band_min_max[0]] = normalize(img[band_min_max[0]], band_min_max[1][0], band_min_max[1][1])
         else: # if it is not a tuple or an int
           raise ValueError('The first element of the tuple must be a tuple or an int')
-    # Normalize the target value
+        
+    # Normalize the target value (0,1)
     oc = normalize(oc, self.oc_min, self.oc_max)
-    
 
-    
     # Cutting out of range Vlaues
     img[img > 1] = 1
     img[img < 0] = 0
+
+    # Modify data based the normalization process (no need for log transformation)
     oc = oc if oc < 1 else 1
     oc = oc if oc > 0 else 0
 
+    # # log transformation instead of normalization 
+    # oc = log_transform(oc)
 
     return img, oc  
 
