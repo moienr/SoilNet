@@ -76,7 +76,7 @@ class SNDataset(Dataset):
 
 class myNormalize:
   """Normalize the image and the target value"""
-  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)], [(12), (-4,2963)], [(13), (0, 90)]], oc_min = 0, oc_max = ...):
+  def __init__(self, img_bands_min_max =[[(0,7),(0,1)], [(7,12),(-1,1)], [(12), (-4,2963)], [(13), (0, 90)]], oc_min = 0, oc_max = 200):
     """
       A class to normalize image and target value arrays.
       
@@ -183,9 +183,9 @@ def plot_bands(image, labels, array):
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    feature_names =[...]
+    feature_names =['aet','def','pdsi','pet','pr','ro','soil','srad','swe','tmmn','tmmx','vap','vpd','vs']
     
-    ds = SNDataset(...,..., climate_csvs_dir="...")
+    ds = SNDataset('D:\python\SoilNet\dataset\l8_images\\train\\','D:\python\SoilNet\dataset\LUCAS_2015_all.csv', climate_csvs_dir="D:\python\SoilNet\dataset\Climate\\filled\\")
     print(len(ds))
     x = ds[0]
     print('OC: ', x[1], type(x[1]))

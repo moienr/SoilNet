@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 import os
 from torchmetrics import R2Score
 
+import pandas as pd
+import numpy as np
+from sklearn.metrics import mean_squared_error, r2_score
+
 
 class RMSELoss(nn.Module):
     def __init__(self):
@@ -63,6 +67,36 @@ class R2Loss(nn.Module):
         """
         ones = torch.ones_like(y)
         return 1 - (self.mse(yhat,y)/self.mse(y,ones*y.mean()))
+    
+
+class RMSLELoss(nn.Module):
+    def __init__(self):
+        super(RMSLELoss, self).__init__()
+
+    def forward(self, predictions, actuals):
+        """
+        Compute the Root Mean Squared Logarithmic Error.
+        
+        Args:
+            predictions (torch.Tensor): The predicted values.
+            actuals (torch.Tensor): The actual values.
+        
+        Returns:
+            torch.Tensor: The computed RMSLE value.
+        """
+        # Ensure predictions are greater than -1, as log(0) and negative values are undefined
+        predictions = torch.clamp(predictions, min=-1 + 1e-9)
+        actuals = torch.clamp(actuals, min=-1 + 1e-9)
+
+        # Calculate the log loss
+        log_diff = torch.log(predictions + 1) - torch.log(actuals + 1)
+        squared_log_diff = torch.square(log_diff)
+
+        # Return the square root of the mean of squared log differences
+        return torch.sqrt(torch.mean(squared_log_diff))
+
+
+    
 
 def train_step(model:nn.Module, data_loader:DataLoader, loss_fn:nn.Module, optimizer:torch.optim.Optimizer):
     model.train()
@@ -200,6 +234,7 @@ def train(model: torch.nn.Module,
           lr_scheduler: bool = None,
           save_model_path = None,
           save_model_if_mae_lower_than = None,
+          save_train_data_metrics = False
           ):
     """ Train the model and test it on the test set
     Note: If you don't have diffrent validation and test sets, just pass the same dataloader for both test and val
@@ -229,7 +264,10 @@ def train(model: torch.nn.Module,
                "val_loss": [],
                "MAE": [],
                "RMSE": [],
-               "R2": []
+               "R2": [],
+               "train_MAE": [],
+                "train_RMSE": [],
+                "train_R2": []
     }
     
     # 3. Loop through training and testing steps for a number of epochs
@@ -265,6 +303,10 @@ def train(model: torch.nn.Module,
     results["MAE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=nn.L1Loss(), verbose=False))
     results["RMSE"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=RMSELoss(), verbose=False))
     results["R2"].append(test_step(model=model, data_loader=test_dataloader, loss_fn=R2Score().to(device), verbose=False)) 
+    if save_train_data_metrics:
+        results["train_MAE"].append(test_step(model=model, data_loader=train_dataloader, loss_fn=nn.L1Loss(), verbose=False))
+        results["train_RMSE"].append(test_step(model=model, data_loader=train_dataloader, loss_fn=RMSELoss(), verbose=False))
+        results["train_R2"].append(test_step(model=model, data_loader=train_dataloader, loss_fn=R2Score().to(device), verbose=False))
     # Save the model
     if save_model_path:
         if save_model_if_mae_lower_than:
@@ -306,3 +348,114 @@ class BatchLoader(torch.utils.data.Dataset):
             if i == index:
                 return batch
         raise IndexError("Index out of range")
+    
+
+
+
+def evaluate_regression_metrics(y_true, y_pred):
+    """Calculate multiple regression evaluation metrics."""
+    # y_true = y_true * 87  # Multiply y_true by 87
+    # y_pred = y_pred * 87  # Multiply y_pred by 87
+    
+    # Calculate RMSE (Root Mean Squared Error)
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    
+    # Calculate R2 (R-squared)
+    r2 = r2_score(y_true, y_pred)
+    
+    # Calculate RPIQ (Relative Prediction Interval Quality)
+
+    y_std = np.std(y_true)
+    rpiq = 1 - (rmse / y_std)
+    
+    # Calculate MAE (Mean Absolute Error)
+    mae = np.mean(np.abs(y_true - y_pred))
+    
+    # Calculate MEC (Mean Error Correction)
+    mec = np.mean(y_true - y_pred)
+
+
+    def rpiq_metric(y_real, y_pred):
+     # Calculate quartiles Q1 and Q3
+     q1 = np.percentile(y_real, 25)
+     q3 = np.percentile(y_pred, 75)
+
+     # Calculate RMSE
+     rmse = np.sqrt(mean_squared_error(y_real, y_pred))
+
+     # Calculate the ratio of the difference between Q3 and Q1 to RMSE
+     ratio = (q3 - q1) / rmse
+
+     return ratio
+    
+    rpiq = rpiq_metric(y_true, y_pred)
+
+    
+    # Calculate CCC (Concordance Correlation Coefficient)
+    def concordance_correlation_coefficient(y_real, y_pred):
+        # Raw data
+        dct = {
+            'y_real': y_real,
+            'y_pred': y_pred
+        }
+        df = pd.DataFrame(dct)
+        # Remove NaNs
+        df = df.dropna()
+        # Pearson product-moment correlation coefficients
+        y_real = df['y_real']
+        y_pred = df['y_pred']
+        cor = np.corrcoef(y_real, y_pred)[0][1]
+        # Means
+        mean_real = np.mean(y_real)
+        mean_pred = np.mean(y_pred)
+        # Population variances
+        var_real = np.var(y_real)
+        var_pred = np.var(y_pred)
+        # Population standard deviations
+        sd_real = np.std(y_real)
+        sd_pred = np.std(y_pred)
+        # Calculate CCC
+        numerator = 2 * cor * sd_real * sd_pred
+        denominator = var_real + var_pred + (mean_real - mean_pred)**2
+
+        return numerator / denominator
+    
+    ccc = concordance_correlation_coefficient(y_true, y_pred)
+    
+
+#Physics-aware loss function design
+# loss_lower = torch.mean(torch.max((1 - self.q) * errors, torch.zeros_like(errors)))
+# loss_upper = torch.mean(torch.max(self.q * errors, torch.zeros_like(errors)))
+class PhysicsPinballLoss(nn.Module):
+    """
+    Calculates quantile (pinball) loss function + two penalty terms for predictions
+    that are lower than the lower bound and more than the upper bound.
+
+    Args:
+     q: your desired lower quantile (e.g., 0.1)
+     beta: scaling factor for penalty term
+    """
+
+    def __init__(self, q, beta):
+        super(PhysicsPinballLoss, self).__init__()
+        self.q = q
+        self.beta = beta
+
+    def forward(self, y_pred, y_true):
+        if self.q >= 0.5:
+            raise ValueError('The input quantile should be lower than 0.5')
+        else:
+            e = y_true - y_pred
+            loss_lower = torch.mean(torch.max(self.q * e, (self.q - 1) * e))
+            loss_upper = torch.mean(torch.max((1 - self.q) * e, ((1 - self.q) - 1) * e))
+
+            lower_bound = y_pred - loss_upper
+            upper_bound = y_pred - loss_lower
+
+            # Penalty terms based on conditions
+            penalty_lower = torch.where(y_true < lower_bound, self.beta * (lower_bound - y_true), torch.tensor(0.0, device=device))
+            penalty_upper = torch.where(y_true > upper_bound, self.beta * (y_true - upper_bound), torch.tensor(0.0, device=device))
+
+            return torch.mean(loss_lower * (1 + penalty_lower) + loss_upper * (1 + penalty_upper))
+
+

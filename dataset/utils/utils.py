@@ -2,6 +2,7 @@
 """
 import numpy as np
 
+
 def correct_image_shape(image):
     """
     Transposes an image with size (C, H, W) to an image with size (H, W, C).
@@ -201,6 +202,19 @@ def normalize(value,min,max):
     """Takes in a value, min and max of the data| returns the normalized value between 0 and 1.
     """
     return (value - min) / (max - min)
+
+def log_transform(value):
+    """
+    Applies log transformation to the given value with the specified base.
+
+    Parameters:
+    - value (float): The value to be transformed.
+    - base (float, optional): The logarithm base. Default is 10.
+
+    Returns:
+    - float: The log-transformed value.
+    """
+    return np.log(value)
 
 
 

@@ -3,6 +3,7 @@
 // Data: https://developers.google.com/earth-engine/datasets/catalog/IDAHO_EPSCOR_TERRACLIMATE
 // Author: Nafiseh Kakhani, University of Tuebingen
 // Date: 13/3/2023
+// Project: Multi-modal deep learning for SOC estimation 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 // Import samples
@@ -26,6 +27,31 @@ var monList = ee.List(ee.List.sequence(0,nMonths).map(function (n){
 }))
 
 print(monList)
+
+function map_climate(feature){
+    // map over each month
+    var timeSeries = ee.List.sequence(0,nMonths).map(function (n){
+    // calculate the offset from startDate
+    var ini = startDate.advance(n,'month');
+    // advance just one month
+    var end = ini.advance(1,'month');
+    // filter and reduce
+    var data = Climatefeature.filterDate(ini,end).mean().reduceRegion({
+      reducer: ee.Reducer.mean(),
+      geometry: feature.geometry(),
+    });
+    
+    // get the value and check that it has data
+    var val = ee.Number(data.get(bandName));
+    val = ee.Number(ee.Algorithms.If(val,val,-999));
+    return val;
+  });
+  
+  // create new dictionary with date strings and values
+  var timeDict = ee.Dictionary.fromLists(monList,ee.List(timeSeries));
+  // return feature with a timeseries property and results
+  return feature.set(timeDict).setGeometry(null); //set the geometry to null to speed up the process
+}
 
 //description of files
 var FILE_PREFIX = 'Climate_' + 'aet'
