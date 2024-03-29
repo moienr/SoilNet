@@ -364,14 +364,16 @@ def evaluate_regression_metrics(y_true, y_pred):
     r2 = r2_score(y_true, y_pred)
     
     # Calculate RPIQ (Relative Prediction Interval Quality)
-    # y_std = np.std(y_true)
-    # rpiq = 1 - (rmse / y_std)
+
+    y_std = np.std(y_true)
+    rpiq = 1 - (rmse / y_std)
     
     # Calculate MAE (Mean Absolute Error)
     mae = np.mean(np.abs(y_true - y_pred))
     
     # Calculate MEC (Mean Error Correction)
     mec = np.mean(y_true - y_pred)
+
 
     def rpiq_metric(y_real, y_pred):
      # Calculate quartiles Q1 and Q3
@@ -387,6 +389,7 @@ def evaluate_regression_metrics(y_true, y_pred):
      return ratio
     
     rpiq = rpiq_metric(y_true, y_pred)
+
     
     # Calculate CCC (Concordance Correlation Coefficient)
     def concordance_correlation_coefficient(y_real, y_pred):
@@ -419,8 +422,6 @@ def evaluate_regression_metrics(y_true, y_pred):
     
     ccc = concordance_correlation_coefficient(y_true, y_pred)
     
-    return rmse, r2, rpiq, mae, mec, ccc
-
 
 #Physics-aware loss function design
 # loss_lower = torch.mean(torch.max((1 - self.q) * errors, torch.zeros_like(errors)))
@@ -456,4 +457,5 @@ class PhysicsPinballLoss(nn.Module):
             penalty_upper = torch.where(y_true > upper_bound, self.beta * (y_true - upper_bound), torch.tensor(0.0, device=device))
 
             return torch.mean(loss_lower * (1 + penalty_lower) + loss_upper * (1 + penalty_upper))
+
 
