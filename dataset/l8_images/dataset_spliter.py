@@ -53,4 +53,4 @@ def split_dataset(directory_path, train_ratio, val_ratio, test_ratio, remove_org
             os.remove(os.path.join(directory_path, file_name))
             
 if __name__ == "__main__":
-    split_dataset("dataset/l8_images", 0.6, 0.2, 0.2)
+ split_dataset("C:\\Users\\nkakhani\\_Multimodal\\SoilNet-7\\SoilNet-PreRelease\\dataset\\l8_images", 0.8, 0.2, 0.0)

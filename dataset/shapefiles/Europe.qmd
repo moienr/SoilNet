@@ -1,0 +1,79 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="3.28.3-Firenze">
+  <identifier>continent</identifier>
+  <parentidentifier></parentidentifier>
+  <language>ENG</language>
+  <type>dataset</type>
+  <title>World Continents</title>
+  <abstract>World Continents represents the boundaries for the continents of the world.
+
+
+
+World Continents represents the boundaries for the continents of the world.
+
+World Continents provides a base map layer of the continents for the world.
+
+Largest scale when displaying the data: 1:15,000,000.</abstract>
+  <keywords vocabulary="gmd:topicCategory">
+    <keyword>polygon</keyword>
+  </keywords>
+  <contact>
+    <contactAddress>
+      <type></type>
+      <address>380 New York Street</address>
+      <city>Redlands</city>
+      <administrativearea>California</administrativearea>
+      <postalcode>92373-8100</postalcode>
+      <country>us</country>
+    </contactAddress>
+    <name>Data Team</name>
+    <organization>ESRI</organization>
+    <position>Data Team</position>
+    <voice>909-793-2853</voice>
+    <fax></fax>
+    <email>info@esri.com</email>
+    <role></role>
+  </contact>
+  <contact>
+    <contactAddress>
+      <type>mailing and physical address</type>
+      <address>380 New York Street</address>
+      <city>Redlands</city>
+      <administrativearea>California</administrativearea>
+      <postalcode>92373-8100</postalcode>
+      <country>USA</country>
+    </contactAddress>
+    <name>ESRI</name>
+    <organization>ESRI</organization>
+    <position></position>
+    <voice>909-793-2853</voice>
+    <fax>909-793-5953</fax>
+    <email>info@esri.com</email>
+    <role>Point of contact</role>
+  </contact>
+  <links>
+    <link name="SDC Feature Database" size="" description="" url="" format="" type="" mimeType=""/>
+  </links>
+  <history>ArcWorld Supplement (source 1 of 2) ESRI, 1996, ArcWorld™ Supplement: ESRI, Redlands, California, USA. Type of source media: CD–ROM Source scale denominator: 3000000 Source contribution: Attribute and geospatial data GMI (source 2 of 2) Global Mapping International, Missions Database: Global Mapping International, Colorado Springs, Colorado, USA. Type of source media: CD–ROM Source contribution: Attribute data Date: 20010111 (change 1 of 3) The following steps were performed by ESRI: Extracted the features from ESRI Data &amp; Maps 1999 data set-admin98.shp. Updated political boundaries for countries and first-level administrative units. Used Continent attribute to dissolve out the necessary features to create the continents. Removed unnecessary attributes. Created ArcGIS® layer file (.lyr). Created projection file (.prj). Created spatial indices. Converted the data set to SDC. Data sources used in this process: ArcWorld Supplement GMI Date: 20040307 (change 2 of 3) The following steps were performed by ESRI: Added SQKM attribute and calculated its values. Added SQMI attribute and calculated its values. Date: 20050211 (change 3 of 3) The following steps were performed by ESRI: Removed the Paracel and Spratly island groups.</history>
+  <fees></fees>
+  <constraints type="Limitations of use">See legal constraints.</constraints>
+  <constraints type="Access">Access granted to Licensee only.</constraints>
+  <rights>The data are provided by multiple, third party data vendors under license to ESRI for inclusion on ESRI Data &amp; Maps for use with ESRI® software. Each data vendor has its own data licensing policies and may grant varying redistribution rights to end users. Please consult the redistribution rights below for this data set provided on ESRI Data &amp; Maps. As used herein, “Geodata” shall mean any digital data set consisting of geographic data coordinates and associated attributes. The redistribution rights for this data set: Redistribution rights are granted by the data vendor for hard-copy renditions or static, electronic map images (e.g. .gif, .jpeg, etc.) that are plotted, printed, or publicly displayed with proper metadata and source/copyright attribution to the respective data vendor(s). Geodata is redistributable with a Value-Added Software Application developed by ESRI Business Partners on a royalty-free basis with proper metadata and source/copyright attribution to the respective data vendor(s). Geodata is redistributable without a Value-Added Software Application (i.e., adding the sample data to an existing, [non]commercial data set for redistribution) with proper metadata and source/copyright attribution to the respective data vendor(s). The terms and conditions below apply to all the data sets provided on ESRI Data &amp; Maps. Proprietary Rights and Copyright: Licensee acknowledges that the Data and Related Materials contain proprietary and confidential property of ESRI and its licensor(s). The Data and Related Materials are owned by ESRI and its licensor(s) and are protected by United States copyright laws and applicable international copyright treaties and/or conventions. Limited Warranty and Disclaimer: ESRI warrants that the media upon which the Data and Related Materials are provided will be free from defects in materials and workmanship under normal use and service for a period of ninety (90) days from the date of receipt. THE DATA AND RELATED MATERIALS ARE EXCLUDED FROM THE LIMITED WARRANTY, AND THE LICENSEE EXPRESSLY ACKNOWLEDGES THAT THE DATA CONTAINS SOME NONCONFORMITIES, DEFECTS, OR ERRORS. ESRI DOES NOT WARRANT THAT THE DATA WILL MEET LICENSEE'S NEEDS OR EXPECTATIONS; THAT THE USE OF THE DATA WILL BE UNINTERRUPTED; OR THAT ALL NONCONFORMITIES, DEFECTS, OR ERRORS CAN OR WILL BE CORRECTED. ESRI IS NOT INVITING RELIANCE ON THIS DATA, AND THE LICENSEE SHOULD ALWAYS VERIFY ACTUAL DATA. EXCEPT FOR THE LIMITED WARRANTY SET FORTH ABOVE, THE DATA AND RELATED MATERIALS CONTAINED THEREIN ARE PROVIDED "AS-IS," WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. Exclusive Remedy and Limitation of Liability: The entire liability of ESRI or its licensor(s) and Licensee's exclusive remedy shall be to terminate the Agreement upon Licensee returning the Data and Related Materials to ESRI with a copy of Licensee's invoice/receipt and ESRI returning the license fees paid to Licensee. IN NO EVENT SHALL ESRI AND/OR ITS LICENSOR(S) BE LIABLE FOR COSTS OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOST PROFITS, LOST SALES, OR BUSINESS EXPENDITURES, INVESTMENTS, OR COMMITMENTS IN CONNECTION WITH ANY BUSINESS; LOSS OF ANY GOODWILL; OR FOR ANY INDIRECT, SPECIAL, INCIDENTAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THIS AGREEMENT OR USE OF THE DATA AND RELATED MATERIALS, HOWEVER CAUSED, ON ANY THEORY OF LIABILITY, AND WHETHER OR NOT ESRI OR ITS LICENSOR(S) HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. THESE LIMITATIONS SHALL APPLY NOTWITHSTANDING ANY FAILURE OF ESSENTIAL PURPOSE OF ANY EXCLUSIVE REMEDY. Third Party Beneficiary: ESRI's licensor(s) has (have) authorized ESRI to (sub)distribute and (sub)license its (their) data as incorporated into the Data and Related Materials. As an intended third party beneficiary to this Agreement, the ESRI licensor(s) is (are) entitled to directly enforce, in its own name, the rights and obligations undertaken by the Licensee and to seek all legal and equitable remedies as are afforded to ESRI. In the event that the data vendor(s) has (have) granted the end user permission to redistribute the Geodata, please use proper proprietary or copyright attribution for the various data vendor(s), and provide the associated metadata file(s) with the Geodata. In compliance with FGDC metadata standards, ESRI has attempted to practice proper metadata methodologies by providing any data source information, descriptions, and file names to assist in this effort.</rights>
+  <encoding></encoding>
+  <crs>
+    <spatialrefsys nativeFormat="Wkt">
+      <wkt>GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]</wkt>
+      <proj4>+proj=longlat +datum=WGS84 +no_defs</proj4>
+      <srsid>3452</srsid>
+      <srid>4326</srid>
+      <authid>EPSG:4326</authid>
+      <description>WGS 84</description>
+      <projectionacronym>longlat</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>true</geographicflag>
+    </spatialrefsys>
+  </crs>
+  <extent>
+    <spatial crs="EPSG:4326" minz="0" minx="-180" maxz="0" miny="-90" maxx="180" dimensions="2" maxy="83.62360900000000186"/>
+  </extent>
+</qgis>
