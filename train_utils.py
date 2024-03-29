@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error, r2_score
 
+
 class RMSELoss(nn.Module):
     def __init__(self):
         super().__init__()
@@ -363,6 +364,7 @@ def evaluate_regression_metrics(y_true, y_pred):
     r2 = r2_score(y_true, y_pred)
     
     # Calculate RPIQ (Relative Prediction Interval Quality)
+
     y_std = np.std(y_true)
     rpiq = 1 - (rmse / y_std)
     
@@ -371,6 +373,23 @@ def evaluate_regression_metrics(y_true, y_pred):
     
     # Calculate MEC (Mean Error Correction)
     mec = np.mean(y_true - y_pred)
+
+
+    def rpiq_metric(y_real, y_pred):
+     # Calculate quartiles Q1 and Q3
+     q1 = np.percentile(y_real, 25)
+     q3 = np.percentile(y_pred, 75)
+
+     # Calculate RMSE
+     rmse = np.sqrt(mean_squared_error(y_real, y_pred))
+
+     # Calculate the ratio of the difference between Q3 and Q1 to RMSE
+     ratio = (q3 - q1) / rmse
+
+     return ratio
+    
+    rpiq = rpiq_metric(y_true, y_pred)
+
     
     # Calculate CCC (Concordance Correlation Coefficient)
     def concordance_correlation_coefficient(y_real, y_pred):
@@ -403,4 +422,40 @@ def evaluate_regression_metrics(y_true, y_pred):
     
     ccc = concordance_correlation_coefficient(y_true, y_pred)
     
-    return rmse, r2, rpiq, mae, mec, ccc
+
+#Physics-aware loss function design
+# loss_lower = torch.mean(torch.max((1 - self.q) * errors, torch.zeros_like(errors)))
+# loss_upper = torch.mean(torch.max(self.q * errors, torch.zeros_like(errors)))
+class PhysicsPinballLoss(nn.Module):
+    """
+    Calculates quantile (pinball) loss function + two penalty terms for predictions
+    that are lower than the lower bound and more than the upper bound.
+
+    Args:
+     q: your desired lower quantile (e.g., 0.1)
+     beta: scaling factor for penalty term
+    """
+
+    def __init__(self, q, beta):
+        super(PhysicsPinballLoss, self).__init__()
+        self.q = q
+        self.beta = beta
+
+    def forward(self, y_pred, y_true):
+        if self.q >= 0.5:
+            raise ValueError('The input quantile should be lower than 0.5')
+        else:
+            e = y_true - y_pred
+            loss_lower = torch.mean(torch.max(self.q * e, (self.q - 1) * e))
+            loss_upper = torch.mean(torch.max((1 - self.q) * e, ((1 - self.q) - 1) * e))
+
+            lower_bound = y_pred - loss_upper
+            upper_bound = y_pred - loss_lower
+
+            # Penalty terms based on conditions
+            penalty_lower = torch.where(y_true < lower_bound, self.beta * (lower_bound - y_true), torch.tensor(0.0, device=device))
+            penalty_upper = torch.where(y_true > upper_bound, self.beta * (y_true - upper_bound), torch.tensor(0.0, device=device))
+
+            return torch.mean(loss_lower * (1 + penalty_lower) + loss_upper * (1 + penalty_upper))
+
+

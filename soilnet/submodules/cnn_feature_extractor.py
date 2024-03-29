@@ -231,6 +231,20 @@ class CNNFlattener64(nn.Module):
         x = self.last_conv(x).squeeze(-1).squeeze(-1) # flatten the output, don't just use squeeze() because it will remove the batch dimension if it is 1
         return x
     
+class ResNet50(nn.Module):
+    def __init__(self, in_channels=14, out_nodes=1024):
+        super().__init__()
+        self.resnet = models.resnet50(weights=None)
+        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
+                                      bias=False)
+        self.relu = nn.ReLU()
+        self.resnet.fc = nn.Linear(2048, out_nodes)  # Modify the output layer for your specific task
+
+    def forward(self, x):
+        x = self.resnet(x)
+        x = self.relu(x)
+        return x
+    
 class BaseResNet(nn.Module):
     def __init__(self, in_channels=14 ,out_nodes=1024):
         super().__init__()
@@ -247,8 +261,24 @@ class ResNet101(nn.Module):
         self.resnet = models.resnet101(weights=None)
         self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
                                bias=False)
-        self.relu = nn.LeakyReLU()
+        # self.relu = nn.LeakyReLU()
+        self.relu = nn.ReLU()
         self.resnet.fc = nn.Linear(2048, out_nodes)  # Flatten to 128 nodes
+    def forward(self, x):
+        x = self.resnet(x)
+        x = self.relu(x)
+        return x
+    
+
+class ResNet152(nn.Module):
+    def __init__(self, in_channels=14, out_nodes=1024):
+        super().__init__()
+        self.resnet = models.resnet152(weights=None)  # Use ResNet152 pretrained on ImageNet
+        self.resnet.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
+                                      bias=False)
+        self.relu = nn.LeakyReLU()
+        self.resnet.fc = nn.Linear(2048, out_nodes)  # Adjust the number of output nodes
+
     def forward(self, x):
         x = self.resnet(x)
         x = self.relu(x)

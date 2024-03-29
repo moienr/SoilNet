@@ -32,7 +32,7 @@ class SNDataset(Dataset):
 
     point_id = l8_img_name.split('_')[0]
     
-    row = self.df[self.df['Point_ID'] == int(point_id)]
+    row = self.df[self.df['Point_ID'] == (point_id)]
     oc = row['OC'].values[0]
     
 
@@ -110,13 +110,13 @@ class SNDatasetClimate(Dataset):
 
     point_id = l8_img_name.split('_')[0]
     
-    row = self.df[self.df['Point_ID'] == int(point_id)] # LUCAS
-    # row = self.df[self.df['Point_ID'] == (point_id)] # RaCA
+    # row = self.df[self.df['Point_ID'] == int(point_id)] # LUCAS
+    row = self.df[self.df['Point_ID'] == (point_id)] # RaCA
 
     oc = row['OC'].values[0]
     
-    self.clim_dfs_row = [df[df['Point_ID'] == int(point_id)] for df in self.clim_dfs] # LUCAS
-    # self.clim_dfs_row = [df[df['Point_ID'] == (point_id)] for df in self.clim_dfs] # RaCA
+    # self.clim_dfs_row = [df[df['Point_ID'] == int(point_id)] for df in self.clim_dfs] # LUCAS
+    self.clim_dfs_row = [df[df['Point_ID'] == (point_id)] for df in self.clim_dfs] # RaCA
 
     self.clim_dfs_row = [df[self.dates] for df in self.clim_dfs_row]
     clim_arr = np.stack([df.values.squeeze() for df in self.clim_dfs_row], axis=1)

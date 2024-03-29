@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from submodules.cnn_feature_extractor import CNNFlattener64, CNNFlattener128,\
                                                 ResNet101, ResNet101GLAM,\
+                                                ResNet50,\
                                                     VGG16, VGG16GLAM
 from submodules.vit import VisionTransformer as ViT
 from submodules.regressor import Regressor, MultiHeadRegressor
@@ -15,7 +16,7 @@ class SoilNet(nn.Module):
         super().__init__()
         if use_glam:
             if cnn_arch == "resnet101":
-                self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "ViT":
@@ -25,7 +26,9 @@ class SoilNet(nn.Module):
 
         else:
             if cnn_arch == "resnet101":
-                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+                self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "resnet50":
+                self.cnn = ResNet50(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "ViT":
@@ -60,7 +63,7 @@ class SoilNetLSTM(nn.Module):
         
         if use_glam:
             if cnn_arch == "resnet101":
-                self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "ViT":
@@ -70,7 +73,9 @@ class SoilNetLSTM(nn.Module):
 
         else:
             if cnn_arch == "resnet101":
-                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+                self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            elif cnn_arch == "resnet50":
+                self.cnn = ResNet50(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "ViT":
@@ -122,6 +127,35 @@ class SoilNetLSTM(nn.Module):
         lstm_output = self.lstm(ts_features)
         output = self.reg(flat_raster, lstm_output)
         return output
+    
+class SoilNetJustLSTM(SoilNetLSTM):
+    """
+    This class inherits from SoilNetLSTM but disables the CNN pathway to use only the climate data.
+    """
+    def __init__(self, use_glam=False, cnn_arch="resnet101", reg_version=1,
+                 cnn_in_channels=14, regresor_input_from_cnn=1024, 
+                 lstm_n_features=10, lstm_n_layers=2, lstm_out=128, hidden_size=128,
+                 rnn_arch="LSTM", seq_len=61, img_size=64):
+        
+        super().__init__(use_glam=use_glam, cnn_arch=cnn_arch, reg_version=reg_version,
+                         cnn_in_channels=cnn_in_channels, regresor_input_from_cnn=regresor_input_from_cnn, 
+                         lstm_n_features=lstm_n_features, lstm_n_layers=lstm_n_layers, lstm_out=lstm_out, hidden_size=hidden_size,
+                         rnn_arch=rnn_arch, seq_len=seq_len, img_size=img_size)
+    
+
+        self.cnn = None
+        self.reg = MultiHeadRegressor(lstm_out, hidden_size= hidden_size, version=reg_version)
+            
+    def forward(self, input_raster_ts: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
+        """
+        Redefine the forward method if the behavior needs to change for JustLSTM.
+        """
+        # Handle case where image data isn't used
+        _, ts_features = input_raster_ts
+        lstm_output = self.lstm(ts_features)
+        output = self.reg(lstm_output)  # Assuming reg can handle this case
+
+        return output
             
 class SoilNetJustLSTM(SoilNetLSTM):
     """
@@ -153,7 +187,6 @@ class SoilNetJustLSTM(SoilNetLSTM):
         return output
 
  
-
 class SoilNetSimCLR(nn.Module):
     def __init__(self, use_glam = False  , cnn_arch = "resnet101", reg_version = 1,
                  cnn_in_channels = 14 ,regresor_input_from_cnn = 128, 
@@ -163,7 +196,7 @@ class SoilNetSimCLR(nn.Module):
         
         if use_glam:
             if cnn_arch == "resnet101":
-                self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "ViT":
@@ -173,7 +206,9 @@ class SoilNetSimCLR(nn.Module):
 
         else:
             if cnn_arch == "resnet101":
-                self.cnn = ResNet101GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+                self.cnn = ResNet101(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
+            if cnn_arch == "resnet50":
+                self.cnn = ResNet50(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "vgg16":
                 self.cnn = VGG16GLAM(in_channels=cnn_in_channels, out_nodes=regresor_input_from_cnn)
             elif cnn_arch == "ViT":
