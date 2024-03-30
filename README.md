@@ -9,4 +9,4 @@ A hybrid multi-model DL model for soil property (SOC) prediction has been presen
 ### Ground Truth
 Our model has been trained via two different datasets:
 - LUCAS: To access the LUCAS topsoil dataset (ground truth), visit: [LUCAS Topsoil Dataset](https://esdac.jrc.ec.europa.eu/content/topsoil-physical-properties-europe-based-lucas-topsoil-data)
-- RaCA: To access the RaCA dataset (ground truth), visit: [RaCA Dataset]((https://www.nrcs.usda.gov/resources/data-and-reports/rapid-carbon-assessment-raca))
+- RaCA: To access the RaCA dataset (ground truth), visit: [RaCA Dataset](https://www.nrcs.usda.gov/resources/data-and-reports/rapid-carbon-assessment-raca)
