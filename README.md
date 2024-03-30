@@ -51,5 +51,5 @@ Our model has been trained via two different datasets:
 - RF + timeseries data -->
 
 ---
-![Graohical_abstract](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/Graphical_abs2.jpg)
+![Graohical_abstract](https://github.com/moienr/SoilNet/blob/main/readme_imgs/Graphical_abs2.jpg)
 ---
