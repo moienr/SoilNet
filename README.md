@@ -1,5 +1,15 @@
 # SoilNet
 
+A hybrid multi-model DL model for soil property (SOC) prediction has been presented. The training consists of two phases: 1) Self-supervised contrastive learning and 2) supervised fine-tuning via ground truth for our downstream task, which is regression.
+
+### Ground Truth
+Our model has been trained via two different datasets:
+- LUCAS:
+- RaCA:
+
+
+
+
 
 <!-- ## Experiments
 
@@ -41,6 +51,5 @@
 - RF + timeseries data
 
 ---
-<!-- ![oc_germany](https://github.com/moienr/SoilNet/blob/da789f2bf2f2df5dacca6b44ea2be63ed516e54f/dataset/oc_histogram.png) -->
 ---
-![oc_all](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/oc_all.png)
+![oc_all](https://github.com/moienr/SoilNet/blob/d0255c1ce411e631265daf311f1ca0d68b7b0412/readme_imgs/Graphical_abs2.jpg)
