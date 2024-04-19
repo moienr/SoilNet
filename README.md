@@ -1,6 +1,7 @@
 # SoilNet
 
-A hybrid multi-model DL model for soil property (SOC) prediction has been presented. The training consists of two phases: 1) Self-supervised contrastive learning and 2) supervised fine-tuning via ground truth for our downstream task, which is regression.
+A hybrid multi-modal DL model for soil property (SOC) prediction has been presented. 
+The training consists of two phases: 1) Self-supervised contrastive learning and 2) supervised fine-tuning via ground truth for our downstream task, which is regression.
 
 ---
 ![Graohical_abstract](https://github.com/moienr/SoilNet/blob/main/readme_imgs/Graphical_abs2.jpg)
