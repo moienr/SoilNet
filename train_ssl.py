@@ -35,12 +35,12 @@ LEARNING_RATE = 1e-4
 NUM_EPOCHS =  2
 LR_SCHEDULER = "step" # step, plateau or None
 DATASET = 'LUCAS' # 'LUCAS', 'RaCA'
-USE_SRTM = True
+USE_SRTM = False
 USE_SPATIAL_ATTENTION =  False
 CNN_ARCHITECTURE = 'ViT' # vgg16 or resnet101 or "ViT"
 RNN_ARCHITECTURE = 'Transformer' # LSTM, GRU, RNN, Transformer
 REG_VERSION = 1 # Regression version 1 or 2
-USE_LSTM_BRANCH = True # If True, the model will use the climate data
+USE_LSTM_BRANCH = False # If True, the model will use the climate data
 SEEDS = [1,] # seeds for the cross validation
 
 parser = argparse.ArgumentParser(description='SoilNet SSL Training')
