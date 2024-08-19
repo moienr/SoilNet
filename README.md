@@ -40,24 +40,26 @@ Our model has been trained via two different datasets:
 ### Model Training 
 Training the model consists of two phases: self-supervised learning and supervised fine-tuning. The files `train_ssl.py` and `train.py` are used for training the self-supervised phase and the final fine-tuning, respectively.
 
-Using the following instructions, you can train your own model, with any dataset, image feature extractor backbone, and Time Series architecture backbone. 
+Using the following instructions, you can train your own model with any image feature extractor backbone, and Time Series architecture backbone. 
+
 **0. Data Preparation:**
+
 Set the paths to the data in the `config.py` file.
 ```python
-train_l8_folder_path = '/path/to/your/project/dataset/l8_images/train/'
-test_l8_folder_path = '/path/to/your/project/dataset/l8_images/test/'
-val_l8_folder_path = '/path/to/your/project/dataset/l8_images/val/'
-lucas_csv_path = '/path/to/your/project/dataset/LUCAS_2015_all.csv'
-climate_csv_folder_path = "/path/to/your/project/dataset/Climate/All/filled/"
+train_l8_folder_path = '/dataset/l8_images/train/'
+test_l8_folder_path = '/dataset/l8_images/test/'
+val_l8_folder_path = '/dataset/l8_images/val/'
+lucas_csv_path = '/dataset/LUCAS_2015_all.csv'
+climate_csv_folder_path = "/dataset/Climate/All/filled/"
 # if have self-supervised pre-trained model:
-SIMCLR_PATH = "/path/to/your/project/results/RUN_LUCAS_Self560_ViT_Trans_D_2024_08_19_T_16_13_SelfSupervised.pth"
+SIMCLR_PATH = "/project/results/RUN_LUCAS_Self560_ViT_Trans_D_2024_08_19_T_16_13_SelfSupervised.pth"
 ```
 
 **1. Self-supervised learning:**
 
-(This phase can be ommited if you have access to the pre-trained model or you are want to only use supervised learning)
+*(This phase can be omitted if you have access to the pre-trained model or you are want to only use supervised learning)*
 
-To train the model in the self-supervised phase, you can run the following command:
+To train the model in the self-supervised phase, you can run `train_ssl.py` with the following command:
 
 ```bash
 python train_ssl.py --num_workers 8 --trbs 64 --lr 0.0001 --num_epochs 100 --lr_scheduler 'step' --dataset 'LUCAS' --use_srtm --use_lstm_branch --cnn_architecture 'ViT' --rnn_architecture 'Transformer' --seeds 1 42 86
@@ -68,21 +70,27 @@ Based on the experiment name, and the time of running the script, the results an
 
 You should add the paths to this saved model in the `config.py` file to use it in the fine-tuning phase.
 
-For a detailed explanation of the arguments, you can run the following command:
-
-```bash
-python train_ssl.py --help
-```
 
 **2. Fine-tuning:**
-To fine-tune the model, or Supervised Learning, you can run the following command:
+
+To fine-tuning the pre-trained model, you can run `train.py` with the following command:
 
 ```bash
-python train.py --dataset 'LUCAS' --num_workers 8 --load_simclr_model --trbs 64 --lr 0.0001 --num_epochs 100 --lr_scheduler 'step' --use_srtm --cnn_architecture 'ViT' --rnn_architecture 'Transformer' --seeds 1 42 86 --use_lstm_branch
+python train.py --dataset 'LUCAS' --num_workers 8 --load_simclr_model --trbs 64 --lr 0.0001 --num_epochs 100 --lr_scheduler 'step' --use_srtm --use_lstm_branch --seeds 1 42 86 
+
+```
+*Note:* if you use `--load_simclr_model`, your architecture will be overwritten by the pre-trained model architecture.
+
+Or for training from scratch:
+
+```bash
+python train.py --dataset 'LUCAS' --num_workers 8 --cnn_architecture 'ViT' --rnn_architecture 'Transformer' --trbs 64 --lr 0.0001 --num_epochs 100 --lr_scheduler 'step' --use_srtm --use_lstm_branch --seeds 1 42 86 
 
 ```
 
-*Note:* if you use `--load_simclr_model`, your architecture will be overwritten by the pre-trained model architecture.
+
+
+
 
 
 **Help:**
@@ -93,6 +101,8 @@ For a detailed explanation of the arguments, you can run the following command:
 python train_ssl.py --help
 python train.py --help
 ```
+
+*If you are a "notebook person", you can use the code in [Release 2.0.0](https://github.com/moienr/SoilNet/releases/tag/v2.0.0) or  [Pre-Release](https://github.com/moienr/SoilNet/tree/ieee-prerelease) branch.*
 
 This repository will be updated gradually. Meanwhile, do not hesitate to contact us via: nkakhani@gmail.com and 
 moienrangzan@gmail.com
