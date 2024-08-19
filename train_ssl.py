@@ -42,23 +42,25 @@ RNN_ARCHITECTURE = 'Transformer' # LSTM, GRU, RNN, Transformer
 REG_VERSION = 1 # Regression version 1 or 2
 USE_LSTM_BRANCH = False # If True, the model will use the climate data
 SEEDS = [1,] # seeds for the cross validation
-
-parser = argparse.ArgumentParser(description='SoilNet SSL Training')
-parser.add_argument('-exp', '--experiment_name', type=str, default=EXP_NAME, help='Experiment name')
-parser.add_argument('-nw', '--num_workers', type=int, default=NUM_WORKERS, help='Number of workers for data loading')
-parser.add_argument('-trbs', '--train_batch_size', type=int, default=TRAIN_BATCH_SIZE, help='Batch size for training')
-parser.add_argument('-tsbs', '--test_batch_size', type=int, default=TEST_BATCH_SIZE, help='Batch size for testing')
-parser.add_argument('-lr', '--learning_rate', type=float, default=LEARNING_RATE, help='Learning rate')
-parser.add_argument('-ne', '--num_epochs', type=int, default=NUM_EPOCHS, help='Number of epochs')
-parser.add_argument('-lrs', '--lr_scheduler', type=str, default=LR_SCHEDULER, choices=['step', 'plateau', 'None'], help='Learning rate scheduler')
-parser.add_argument('-ds', '--dataset', type=str, default=DATASET, choices=['LUCAS', 'RaCA'], help='Dataset name')
-parser.add_argument('-srtm', '--use_srtm', action='store_true', default=USE_SRTM, help='Use SRTM data')
-parser.add_argument('-sa', '--use_spatial_attention', action='store_true', default=USE_SPATIAL_ATTENTION, help='Use spatial attention')
-parser.add_argument('-cnn', '--cnn_architecture', type=str, default=CNN_ARCHITECTURE, choices=['vgg16', 'resnet101', 'ViT'], help='CNN architecture')
-parser.add_argument('-rnn', '--rnn_architecture', type=str, default=RNN_ARCHITECTURE, choices=['LSTM', 'GRU', 'RNN', 'Transformer'], help='RNN architecture')
-parser.add_argument('-rv', '--reg_version', type=int, default=REG_VERSION, choices=[1, 2], help='Regression version')
-parser.add_argument('-lstm', '--use_lstm_branch', action='store_true', default=USE_LSTM_BRANCH, help='Use Climate data (I know! the name is misleading!)') 
-parser.add_argument('-s', '--seeds', nargs='+', type=int, default=SEEDS, help='Seeds for cross validation')
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='SoilNet SSL Training')
+    parser.add_argument('-exp', '--experiment_name', type=str, default=EXP_NAME, help='Experiment name')
+    parser.add_argument('-nw', '--num_workers', type=int, default=NUM_WORKERS, help='Number of workers for data loading')
+    parser.add_argument('-trbs', '--train_batch_size', type=int, default=TRAIN_BATCH_SIZE, help='Batch size for training')
+    parser.add_argument('-tsbs', '--test_batch_size', type=int, default=TEST_BATCH_SIZE, help='Batch size for testing')
+    parser.add_argument('-lr', '--learning_rate', type=float, default=LEARNING_RATE, help='Learning rate')
+    parser.add_argument('-ne', '--num_epochs', type=int, default=NUM_EPOCHS, help='Number of epochs')
+    parser.add_argument('-lrs', '--lr_scheduler', type=str, default=LR_SCHEDULER, choices=['step', 'plateau', 'None'], help='Learning rate scheduler')
+    parser.add_argument('-ds', '--dataset', type=str, default=DATASET, choices=['LUCAS', 'RaCA'], help='Dataset name')
+    parser.add_argument('-srtm', '--use_srtm', action='store_true', default=USE_SRTM, help='Use SRTM data')
+    parser.add_argument('-sa', '--use_spatial_attention', action='store_true', default=USE_SPATIAL_ATTENTION, help='Use spatial attention')
+    parser.add_argument('-cnn', '--cnn_architecture', type=str, default=CNN_ARCHITECTURE, choices=['vgg16', 'resnet101', 'ViT'], help='CNN architecture')
+    parser.add_argument('-rnn', '--rnn_architecture', type=str, default=RNN_ARCHITECTURE, choices=['LSTM', 'GRU', 'RNN', 'Transformer'], help='RNN architecture')
+    parser.add_argument('-rv', '--reg_version', type=int, default=REG_VERSION, choices=[1, 2], help='Regression version')
+    parser.add_argument('-lstm', '--use_lstm_branch', action='store_true', default=USE_LSTM_BRANCH, help='Use Climate data (I know! the name is misleading!)') 
+    parser.add_argument('-s', '--seeds', nargs='+', type=int, default=SEEDS, help='Seeds for cross validation')
+    
+    return parser.parse_args()
 
 
 train_l8_folder_path = config.train_l8_folder_path
@@ -74,6 +76,7 @@ if __name__ == '__main__':
     start_string = now.strftime("%Y-%m-%d %H:%M:%S")
     print("Current Date and Time:", start_string)
 
+    parser = parse_arguments()
     args = parser.parse_args()
     EXP_NAME = args.experiment_name
     NUM_WORKERS = args.num_workers
