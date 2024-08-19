@@ -1,7 +1,6 @@
 from train_SimCLR_utils import *
 import torch
 from torch.utils.data import DataLoader
-from dataset.dataset_loader import SNDataset,SNDatasetClimate, myNormalize, myToTensor, Augmentations
 from torchvision import transforms
 import random
 import numpy as np
@@ -11,7 +10,7 @@ from datetime import date, datetime
 import torch.nn.functional as F
 import cv2
 import json
-from dataset.dataset_loader import SNDataset,SNDatasetClimate, myNormalize, myToTensor, Augmentations
+
 import os
 from soilnet.soil_net import SoilNet, SoilNetLSTM, SoilNetSimCLR
 
@@ -93,8 +92,10 @@ if __name__ == '__main__':
     SEEDS = args.seeds
 
     if DATASET == 'LUCAS':
+        from dataset.dataset_loader import SNDataset,SNDatasetClimate, myNormalize, myToTensor, Augmentations
         OC_MAX = 560.2
     elif DATASET == 'RaCA':
+        from dataset.dataset_loader_us import SNDataset,SNDatasetClimate, myNormalize, myToTensor, Augmentations
         OC_MAX = 4115
     else:
         raise ValueError('Invalid dataset Name')
