@@ -57,7 +57,7 @@ SIMCLR_PATH = "/project/results/RUN_LUCAS_Self560_ViT_Trans_D_2024_08_19_T_16_13
 
 **1. Self-supervised learning:**
 
-*(This phase can be omitted if you have access to the pre-trained model or you are want to only use supervised learning)*
+*(This phase can be omitted if you have access to the pre-trained model or you want to only use supervised learning)*
 
 To train the model in the self-supervised phase, you can run `train_ssl.py` with the following command:
 
