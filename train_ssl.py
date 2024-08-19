@@ -22,19 +22,12 @@ import config
 import argparse
 
 
-
 # create a folder called 'results' in the current directory if it doesn't exist
 if not os.path.exists('results'):
     os.mkdir('results')
     
-
-
-
-
 # Setup device-agnostic code
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-
 
 # CONFIG
 EXP_NAME = 'LUCAS_Self560_ViT_Trans'
@@ -71,17 +64,11 @@ parser.add_argument('-lstm', '--use_lstm_branch', action='store_true', default=U
 parser.add_argument('-s', '--seeds', nargs='+', type=int, default=SEEDS, help='Seeds for cross validation')
 
 
-
-
 train_l8_folder_path = config.train_l8_folder_path
 test_l8_folder_path = config.test_l8_folder_path
 val_l8_folder_path = config.val_l8_folder_path
 lucas_csv_path = config.lucas_csv_path
 climate_csv_folder_path = config.climate_csv_folder_path
-
-
-
-
 
 
 if __name__ == '__main__':
@@ -90,8 +77,6 @@ if __name__ == '__main__':
     start_string = now.strftime("%Y-%m-%d %H:%M:%S")
     print("Current Date and Time:", start_string)
 
-    
-    
     args = parser.parse_args()
     EXP_NAME = args.experiment_name
     NUM_WORKERS = args.num_workers
@@ -188,10 +173,6 @@ if __name__ == '__main__':
     if not os.path.exists('results'):
         os.mkdir('results')
         
-        
-
-    
-
 
     best_mae = 1000 # just a big number, since our data is normalized between 0 and 1, mae is between 0 and 1 too.
     best_seed = SEEDS[0]
