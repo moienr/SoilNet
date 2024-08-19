@@ -7,7 +7,9 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
                            min_max_bounds= True,
                            tight_x_lim = True, y_lim=None,
                            train_legend = "Train", test_legend = "Test",
-                           save_path=None)->None:
+                           save_path=None,
+                           show=True
+                           )->None:
     """
     This function takes in train and test losses as inputs and plots them using matplotlib.
 
@@ -22,6 +24,7 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     tight_x_lim (bool): If True, the x-axis limits are set to (0, num_epochs), if False, the x-axis limits are set automatically by matplotlib (default is True)
     y_lim (tuple): Limits for the y-axis (default is None)
     save_path (str): If provided, saves the plot at the given path (default is None)
+    show (bool): If True, shows the plot, if False, does not show the plot (default is True)
 
     Returns:
     ---
@@ -31,6 +34,10 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     ---
     plot_train_test_losses(train_losses, test_losses, title="Train Test Losses", x_label="Epochs", y_label="RMSE")
     """
+    if not show:
+        plt.figure()
+    
+    
     plt.rcParams["font.family"] = "Times New Roman"
     plt.rcParams["font.size"] = 14
     plt.rcParams["axes.labelsize"] = 12
@@ -68,7 +75,8 @@ def plot_train_test_losses(train_losses:np.array, test_losses:np.array, title="T
     if save_path is not None:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.tight_layout()
-    plt.show()
+    if show:
+        plt.show()
 
 
 def normalize(x):

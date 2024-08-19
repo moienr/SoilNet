@@ -236,7 +236,7 @@ class TSTransformerEncoderClassiregressor(nn.Module):
 
         return output
 
-print("__name__:", __name__)
+# print("__name__:", __name__)
 if __name__ == "__main__":
     print("Testing TSTransformerEncoderClassiregressor...")
     x = torch.rand(2, 3, 4) # (batch_size, seq_length, feat_dim)
