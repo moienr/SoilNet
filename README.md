@@ -40,6 +40,7 @@ Our model has been trained via two different datasets:
 ### Model Training 
 Training the model consists of two phases: self-supervised learning and supervised fine-tuning. The files `train_ssl.py` and `train.py` are used for training the self-supervised phase and the final fine-tuning, respectively.
 
+Using the following instructions, you can train your own model, with any dataset, image feature extractor backbone, and Time Series architecture backbone. 
 **0. Data Preparation:**
 Set the paths to the data in the `config.py` file.
 ```python
@@ -70,7 +71,7 @@ You should add the paths to this saved model in the `config.py` file to use it i
 For a detailed explanation of the arguments, you can run the following command:
 
 ```bash
-python your_script.py --help
+python train_ssl.py --help
 ```
 
 **2. Fine-tuning:**
@@ -84,6 +85,14 @@ python train.py --dataset 'LUCAS' --num_workers 8 --load_simclr_model --trbs 64 
 *Note:* if you use `--load_simclr_model`, your architecture will be overwritten by the pre-trained model architecture.
 
 
+**Help:**
+
+For a detailed explanation of the arguments, you can run the following command:
+
+```bash
+python train_ssl.py --help
+python train.py --help
+```
 
 This repository will be updated gradually. Meanwhile, do not hesitate to contact us via: nkakhani@gmail.com and 
 moienrangzan@gmail.com
