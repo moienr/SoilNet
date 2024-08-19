@@ -422,6 +422,7 @@ def evaluate_regression_metrics(y_true, y_pred):
     
     ccc = concordance_correlation_coefficient(y_true, y_pred)
     
+    return rmse, r2, rpiq, mae, mec, ccc    
 
 #Physics-aware loss function design
 # loss_lower = torch.mean(torch.max((1 - self.q) * errors, torch.zeros_like(errors)))
