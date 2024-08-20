@@ -102,7 +102,7 @@ python train_ssl.py --help
 python train.py --help
 ```
 
-*If you pefere using notebooks, you can use the code in [Release 2.0.0](https://github.com/moienr/SoilNet/releases/tag/v2.0.0).
+*If you prefer using notebooks, you can use the code in [Release 2.0.0](https://github.com/moienr/SoilNet/releases/tag/v2.0.0).*
 
 This repository will be updated gradually. Meanwhile, do not hesitate to contact us via: nkakhani@gmail.com and 
 moienrangzan@gmail.com
