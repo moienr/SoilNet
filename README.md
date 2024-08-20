@@ -52,7 +52,7 @@ val_l8_folder_path = '/dataset/l8_images/val/'
 lucas_csv_path = '/dataset/LUCAS_2015_all.csv'
 climate_csv_folder_path = "/dataset/Climate/All/filled/"
 # if have self-supervised pre-trained model:
-SIMCLR_PATH = "/project/results/RUN_LUCAS_Self560_ViT_Trans_D_2024_08_19_T_16_13_SelfSupervised.pth"
+SIMCLR_PATH = "/project/results/yourSavedModel.pth"
 ```
 
 **1. Self-supervised learning:**
@@ -102,7 +102,7 @@ python train_ssl.py --help
 python train.py --help
 ```
 
-*If you are a "notebook person", you can use the code in [Release 2.0.0](https://github.com/moienr/SoilNet/releases/tag/v2.0.0) or  [Pre-Release](https://github.com/moienr/SoilNet/tree/ieee-prerelease) branch.*
+*If you pefere using notebooks, you can use the code in [Release 2.0.0](https://github.com/moienr/SoilNet/releases/tag/v2.0.0).
 
 This repository will be updated gradually. Meanwhile, do not hesitate to contact us via: nkakhani@gmail.com and 
 moienrangzan@gmail.com
