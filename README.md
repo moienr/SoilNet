@@ -106,3 +106,23 @@ python train.py --help
 
 This repository will be updated gradually. Meanwhile, do not hesitate to contact us via: nkakhani@gmail.com and 
 moienrangzan@gmail.com
+
+
+## Credits
+
+(citation will be updated after the publication)
+If you find this work useful, please consider citing:
+
+```bibtex
+@ARTICLE{10639449,
+  author={Kakhani, Nafiseh and Rangzan, Moien and Jamali, Ali and Attarchi, Sara and Alavipanah, Seyed Kazem and Mommert, Michael and Tziolas, Nikolaos and Scholten, Thomas},
+  journal={IEEE Transactions on Geoscience and Remote Sensing}, 
+  title={SSL-SoilNet: A Hybrid Transformer-based Framework with Self-Supervised Learning for Large-scale Soil Organic Carbon Prediction}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={1-1},
+  keywords={Deep learning;Self-supervised model;Contrastive learning;spatio-temporal model;Soil Organic Carbon (SOC);Digital Soil Mapping (DSM);LUCAS;Europe},
+  doi={10.1109/TGRS.2024.3446042}}
+
+```
