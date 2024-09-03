@@ -112,7 +112,6 @@ moienrangzan@gmail.com
 
 If you find this work useful, please consider citing:
 
-*(citation will be updated after the publication)*
 
 ```bibtex
 @ARTICLE{10639449,
