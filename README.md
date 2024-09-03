@@ -116,14 +116,14 @@ If you find this work useful, please consider citing:
 
 ```bibtex
 @ARTICLE{10639449,
-  author={Kakhani, Nafiseh and Rangzan, Moien and Jamali, Ali and Attarchi, Sara and Alavipanah, Seyed Kazem and Mommert, Michael and Tziolas, Nikolaos and Scholten, Thomas},
+  author={Kakhani, Nafiseh and Rangzan, Moien and Jamali, Ali and Attarchi, Sara and Kazem Alavipanah, Seyed and Mommert, Michael and Tziolas, Nikolaos and Scholten, Thomas},
   journal={IEEE Transactions on Geoscience and Remote Sensing}, 
-  title={SSL-SoilNet: A Hybrid Transformer-based Framework with Self-Supervised Learning for Large-scale Soil Organic Carbon Prediction}, 
+  title={SSL-SoilNet: A Hybrid Transformer-Based Framework With Self-Supervised Learning for Large-Scale Soil Organic Carbon Prediction}, 
   year={2024},
-  volume={},
+  volume={62},
   number={},
-  pages={1-1},
-  keywords={Deep learning;Self-supervised model;Contrastive learning;spatio-temporal model;Soil Organic Carbon (SOC);Digital Soil Mapping (DSM);LUCAS;Europe},
+  pages={1-15},
+  keywords={Data models;Meteorology;Transformers;Contrastive learning;Carbon;Remote sensing;Training;Contrastive learning;deep learning (DL);digital soil mapping (DSM);Europe;LUCAS;self-supervised model;soil organic carbon (SOC);spatiotemporal model},
   doi={10.1109/TGRS.2024.3446042}}
 
 ```
